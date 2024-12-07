@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
+import VaultPage from './pages/vault/VaultPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuth } from './hooks/useAuth';
 
@@ -12,28 +13,26 @@ const App: React.FC = () => {
         <Router>
             <Routes>
                 {/* Public Routes */}
-                <Route>
-                    <Route 
-                        path="/login" 
-                        element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />} 
-                    />
-                    <Route 
-                        path="/register" 
-                        element={user ? <Navigate to="/dashboard" replace /> : <RegisterPage />} 
-                    />
-                </Route>
+                <Route 
+                    path="/login" 
+                    element={user ? <Navigate to="/vault" replace /> : <LoginPage />} 
+                />
+                <Route 
+                    path="/register" 
+                    element={user ? <Navigate to="/vault" replace /> : <RegisterPage />} 
+                />
 
                 {/* Protected Routes */}
-                {/* <Route path="/dashboard" element={
+                <Route path="/vault" element={
                     <ProtectedRoute>
-                        
+                        <VaultPage />
                     </ProtectedRoute>
-                } /> */}
+                } />
 
                 {/* Redirect root to appropriate page */}
                 <Route 
                     path="/" 
-                    element={<Navigate to={user ? "/dashboard" : "/login"} replace />} 
+                    element={<Navigate to={user ? "/vault" : "/login"} replace />} 
                 />
 
                 {/* 404 Page - Optional */}

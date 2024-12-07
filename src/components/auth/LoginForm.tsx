@@ -24,7 +24,7 @@ const LoginForm: React.FC = () => {
         e.preventDefault();
         const success = await login(credentials);
         if (success) {
-            navigate('/dashboard');
+            navigate('/vault');
         }
     };
 
