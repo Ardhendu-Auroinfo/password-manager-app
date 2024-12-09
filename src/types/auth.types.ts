@@ -8,23 +8,22 @@ export interface IRegisterCredentials extends ILoginCredentials {
     masterPasswordHint?: string;
 }
 
+export interface IUser {
+    id: string;
+    email: string;
+    created_at?: string;
+}
+
 export interface IAuthResponse {
     success: boolean;
     message?: string;
     data?: {
-        user: IUser;
         token: string;
+        user: IUser;
     };
 }
 
 export interface IAuthError {
     message: string;
-    field?: string;
-}
-
-export interface IUser {
-    id: string;
-    email: string;
-    createdAt: string;
-    updatedAt: string;
+    field: string;
 }

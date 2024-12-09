@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ICreatePasswordEntry, IDecryptedPasswordEntry } from '../../types/vault.types';
 import Modal from '../common/Modal';
 import PasswordForm from './PasswordForm';
@@ -17,11 +17,14 @@ const PasswordModal: React.FC<PasswordModalProps> = ({
     entry,
     onSuccess
 }) => {
-    const [isLoading, setIsLoading] = React.useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async (data: ICreatePasswordEntry) => {
         try {
             setIsLoading(true);
+            setError(null);
+
             if (entry) {
                 await VaultService.updateEntry(entry.id, data);
             } else {
@@ -31,7 +34,7 @@ const PasswordModal: React.FC<PasswordModalProps> = ({
             onClose();
         } catch (error) {
             console.error('Error saving password:', error);
-            // TODO: Add error handling/notification
+            setError(error instanceof Error ? error.message : 'An error occurred while saving the password');
         } finally {
             setIsLoading(false);
         }
@@ -43,6 +46,11 @@ const PasswordModal: React.FC<PasswordModalProps> = ({
             onClose={onClose}
             title={entry ? 'Edit Password' : 'Add New Password'}
         >
+            {error && (
+                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+                    <p className="text-red-600">{error}</p>
+                </div>
+            )}
             <PasswordForm
                 initialData={entry}
                 onSubmit={handleSubmit}

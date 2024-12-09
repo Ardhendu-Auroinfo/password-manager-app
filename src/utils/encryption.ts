@@ -1,6 +1,10 @@
 import CryptoJS from 'crypto-js';
 
-export const encryptData = (data: string, key: string): string => {
+export const encryptData = (data: string, key: string | null): string => {
+    if (!key) {
+        throw new Error('Encryption key is missing');
+    }
+
     try {
         return CryptoJS.AES.encrypt(data, key).toString();
     } catch (error) {
@@ -9,7 +13,11 @@ export const encryptData = (data: string, key: string): string => {
     }
 };
 
-export const decryptData = (encryptedData: string, key: string): string => {
+export const decryptData = (encryptedData: string, key: string | null): string => {
+    if (!key) {
+        throw new Error('Decryption key is missing');
+    }
+
     try {
         const bytes = CryptoJS.AES.decrypt(encryptedData, key);
         return bytes.toString(CryptoJS.enc.Utf8);
