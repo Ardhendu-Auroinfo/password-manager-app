@@ -1,3 +1,4 @@
+import { store } from '../store';
 import { IPasswordEntry, IDecryptedPasswordEntry, ICreatePasswordEntry } from '../types/vault.types';
 import { encryptData, decryptData } from '../utils/encryption';
 
@@ -9,7 +10,7 @@ export class VaultService {
         method: string = 'GET',
         body?: any
     ): Promise<T> {
-        const token = localStorage.getItem('token');
+        const token = store.getState().auth.token;
         
         if (!token) {
             throw new Error('No authentication token found');
@@ -29,7 +30,6 @@ export class VaultService {
 
             if (!response.ok) {
                 if (response.status === 401) {
-                    console.log('Session expired. Please login again.');
                     throw new Error('Session expired. Please login again.');
                 }
                 throw new Error(data.message || 'An error occurred');
@@ -72,7 +72,7 @@ export class VaultService {
     }
 
     private static getMasterKey(): string {
-        const masterKey = localStorage.getItem('masterKey');
+        const masterKey = store.getState().auth.masterKey;
         if (!masterKey) {
             throw new Error('Master key not found. Please login again.');
         }

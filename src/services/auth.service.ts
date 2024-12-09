@@ -38,7 +38,6 @@ export const AuthService = {
     },
 
     logout(): void {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        // No need to handle localStorage here
     }
 };
