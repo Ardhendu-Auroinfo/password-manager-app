@@ -27,7 +27,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build:extension": "webpack --config webpack.extension.config.js",
+    "dev:extension": "webpack --watch --config webpack.extension.config.js"
   },
   "eslintConfig": {
     "extends": [
@@ -50,9 +52,15 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@tailwindcss/forms": "^0.5.9",
+    "@types/chrome": "^0.0.287",
     "@types/crypto-js": "^4.2.2",
     "autoprefixer": "^10.4.20",
+    "copy-webpack-plugin": "^12.0.2",
     "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.16"
+    "process": "^0.11.10",
+    "tailwindcss": "^3.4.16",
+    "ts-loader": "^9.5.1",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^5.1.4"
   }
 }
