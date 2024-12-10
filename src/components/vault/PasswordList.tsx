@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { KeyIcon, EyeIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { KeyIcon, EyeIcon, PencilIcon, TrashIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { useVault } from '../../contexts/VaultContext';
 import { IDecryptedPasswordEntry } from '../../types/vault.types';
 import EditPasswordModal from './EditPasswordModal';
 import { VaultService } from '../../services/vault.service';
-
+import { toast } from 'react-hot-toast';
 const PasswordList: React.FC = () => {
     const { entries, loading, error, deleteEntry } = useVault();
     const [selectedEntry, setSelectedEntry] = useState<IDecryptedPasswordEntry | null>(null);
@@ -13,10 +13,10 @@ const PasswordList: React.FC = () => {
     const handleCopyPassword = async (password: string) => {
         try {
             await navigator.clipboard.writeText(password);
-            // TODO: Add success notification
+            toast.success('Password copied to clipboard');
         } catch (err) {
             console.error('Failed to copy password:', err);
-            // TODO: Add error notification
+            toast.error('Failed to copy password');
         }
     };
 
@@ -28,6 +28,25 @@ const PasswordList: React.FC = () => {
         } catch (err) {
             console.error('Failed to fetch entry:', err);
             // Handle error (e.g., show notification)
+        }
+    };
+
+    const handleWebsiteLaunch = async (entry: IDecryptedPasswordEntry) => {
+        try {
+            // Copy credentials to clipboard
+            const credentials = `Username: ${entry.username}\nPassword: ${entry.password}`;
+            await navigator.clipboard.writeText(credentials);
+            
+            // Open website in new tab
+            if (entry.website_url) {
+                window.open(entry.website_url, '_blank');
+                toast.success('Credentials copied and website opened');
+            } else {
+                toast.error('No website URL provided');
+            }
+        } catch (err) {
+            console.error('Failed to launch website:', err);
+            toast.error('Failed to launch website');
         }
     };
 
@@ -78,6 +97,15 @@ const PasswordList: React.FC = () => {
                                 </div>
                                 
                                 <div className="flex items-center space-x-4">
+                                    {entry.website_url && (
+                                        <button
+                                            onClick={() => handleWebsiteLaunch(entry)}
+                                            className="text-gray-400 hover:text-blue-500"
+                                            title="Launch website"
+                                        >
+                                            <ArrowTopRightOnSquareIcon className="h-5 w-5" />
+                                        </button>
+                                    )}
                                     <button
                                         onClick={() => handleCopyPassword(entry.password)}
                                         className="text-gray-400 hover:text-gray-500"
@@ -98,6 +126,7 @@ const PasswordList: React.FC = () => {
                                         onClick={() => {
                                             if (window.confirm('Are you sure you want to delete this password?')) {
                                                 deleteEntry(entry.id);
+                                                toast.success('Password deleted successfully');
                                             }
                                         }}
                                         className="text-gray-400 hover:text-red-500"

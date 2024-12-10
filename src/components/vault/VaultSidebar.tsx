@@ -18,10 +18,10 @@ const VaultSidebar: React.FC = () => {
                             <StarIcon className="mr-3 h-6 w-6" />
                             Favorites
                         </a>
-                        <a href="#" className="group flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
+                        {/* <a href="#" className="group flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
                             <FolderIcon className="mr-3 h-6 w-6" />
                             Categories
-                        </a>
+                        </a> */}
                     </nav>
                 </div>
             </div>

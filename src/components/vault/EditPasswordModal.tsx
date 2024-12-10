@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { XMarkIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, ClipboardIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { useVault } from '../../contexts/VaultContext';
 import { IDecryptedPasswordEntry } from '../../types/vault.types';
 import PasswordStrengthMeter from '../common/PasswordStrengthMeter';
@@ -99,15 +99,6 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
         }
     };
 
-    const generatePassword = () => {
-        const length = 16;
-        const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+";
-        let password = "";
-        for (let i = 0; i < length; i++) {
-            password += charset.charAt(Math.floor(Math.random() * charset.length));
-        }
-        setFormData(prev => ({ ...prev, password }));
-    };
 
     if (!isOpen) return null;
 
@@ -210,7 +201,7 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
                                     {showPassword ? (
                                         <EyeSlashIcon className="h-5 w-5 text-gray-400" />
                                     ) : (
-                                        <EyeIcon className="h-5 w-5 text-gray-400" />
+                                        <ClipboardIcon className="h-5 w-5 text-gray-400" />
                                     )}
                                 </button>
                             </div>
@@ -221,13 +212,7 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
                                 password={formData.password} 
                                 email={formData.username}
                             />
-                            <button
-                                type="button"
-                                onClick={generatePassword}
-                                className="mt-2 text-sm text-blue-600 hover:text-blue-500"
-                            >
-                                Generate Strong Password
-                            </button>
+                            
                         </div>
 
                         <div>
