@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { ICreatePasswordEntry, IDecryptedPasswordEntry } from '../../types/vault.types';
 import Modal from '../common/Modal';
 import PasswordForm from './PasswordForm';
-import { VaultService } from '../../services/vault.service';
+import { useVault } from '../../contexts/VaultContext';
+import { toast } from 'react-hot-toast';
 
 interface PasswordModalProps {
     isOpen: boolean;
@@ -17,45 +18,47 @@ const PasswordModal: React.FC<PasswordModalProps> = ({
     entry,
     onSuccess
 }) => {
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const { addEntry } = useVault();
+    const [loading, setLoading] = useState(false);
+    const [hasChanges, setHasChanges] = useState(false);
+
+    const handleClose = () => {
+        if (hasChanges) {
+            if (window.confirm('You have unsaved changes. Are you sure you want to close?')) {
+                onClose();
+            }
+        } else {
+            onClose();
+        }
+    };
 
     const handleSubmit = async (data: ICreatePasswordEntry) => {
         try {
-            setIsLoading(true);
-            setError(null);
-
-            if (entry) {
-                await VaultService.updateEntry(entry.id, data);
-            } else {
-                await VaultService.createEntry(data);
-            }
-            onSuccess();
+            setLoading(true);
+            await addEntry(data);
+            setHasChanges(false);
             onClose();
+            onSuccess?.();
+            toast.success('Password added successfully');
         } catch (error) {
-            console.error('Error saving password:', error);
-            setError(error instanceof Error ? error.message : 'An error occurred while saving the password');
+            console.error('Failed to add password:', error);
+            toast.error('Failed to add password');
         } finally {
-            setIsLoading(false);
+            setLoading(false);
         }
     };
 
     return (
         <Modal
             isOpen={isOpen}
-            onClose={onClose}
+            onClose={handleClose}
             title={entry ? 'Edit Password' : 'Add New Password'}
         >
-            {error && (
-                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
-                    <p className="text-red-600">{error}</p>
-                </div>
-            )}
             <PasswordForm
                 initialData={entry}
                 onSubmit={handleSubmit}
-                onCancel={onClose}
-                isLoading={isLoading}
+                onCancel={handleClose}
+                isLoading={loading}
             />
         </Modal>
     );

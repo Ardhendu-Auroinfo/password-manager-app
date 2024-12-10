@@ -1,13 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { IPasswordEntry, ICreatePasswordEntry, IDecryptedPasswordEntry } from '../types/vault.types';
 import { VaultService } from '../services/vault.service';
+import { useAuth } from '../hooks/useAuth';
 
 interface VaultContextType {
     entries: IDecryptedPasswordEntry[];
     loading: boolean;
     error: string | null;
     refreshEntries: () => Promise<void>;
-    addEntry: (entry: ICreatePasswordEntry) => Promise<void>;
+    addEntry: (entry: ICreatePasswordEntry) => Promise<IDecryptedPasswordEntry>;
     updateEntry: (id: string, entry: Partial<ICreatePasswordEntry>) => Promise<void>;
     deleteEntry: (id: string) => Promise<void>;
     searchEntries: (query: string) => Promise<void>;
@@ -17,8 +18,9 @@ const VaultContext = createContext<VaultContextType | undefined>(undefined);
 
 export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [entries, setEntries] = useState<IDecryptedPasswordEntry[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { isAuthenticated } = useAuth();
 
     const refreshEntries = async () => {
         try {
@@ -27,8 +29,8 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             const fetchedEntries = await VaultService.getAllEntries();
             setEntries(fetchedEntries);
         } catch (err) {
+            console.error('Error fetching entries:', err);
             setError('Failed to fetch entries');
-            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -38,8 +40,9 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         try {
             setLoading(true);
             setError(null);
-            await VaultService.createEntry(entry);
-            await refreshEntries();
+            const newEntry = await VaultService.createEntry(entry);
+            setEntries(prevEntries => [...prevEntries, newEntry]);
+            return newEntry;
         } catch (err) {
             setError('Failed to add entry');
             throw err;
@@ -91,8 +94,10 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     useEffect(() => {
-        refreshEntries();
-    }, []);
+        if (isAuthenticated) {
+            refreshEntries();
+        }
+    }, [isAuthenticated]);
 
     return (
         <VaultContext.Provider
@@ -101,7 +106,7 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 loading,
                 error,
                 refreshEntries,
-                addEntry,
+                addEntry, 
                 updateEntry,
                 deleteEntry,
                 searchEntries

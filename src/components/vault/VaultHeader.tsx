@@ -6,6 +6,7 @@ import Button from '../common/Button';
 import PasswordModal from './PasswordModal';
 import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 import { toast } from 'react-hot-toast';
+import { useVault } from '../../contexts/VaultContext';
 
 const VaultHeader: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,13 +14,13 @@ const VaultHeader: React.FC = () => {
     const profileRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const { user, logout } = useAuth();
+    const { refreshEntries } = useVault();
 
     useOnClickOutside(profileRef, () => setIsProfileOpen(false));
 
     const handleLogout = () => {
         try {
             logout();
-            toast.success('Logged out successfully');
             navigate('/login', { replace: true });
         } catch (error) {
             console.error('Logout error:', error);
@@ -27,8 +28,9 @@ const VaultHeader: React.FC = () => {
         }
     };
 
-    const handleSuccess = () => {
+    const handleSuccess = async () => {
         setIsModalOpen(false);
+        await refreshEntries();
         toast.success('Password added successfully');
     };
 

@@ -11,6 +11,13 @@ interface PasswordFormProps {
     isLoading?: boolean;
 }
 
+interface FormErrors {
+    title?: string;
+    username?: string;
+    password?: string;
+    website_url?: string;
+}
+
 const PasswordForm: React.FC<PasswordFormProps> = ({
     initialData,
     onSubmit,
@@ -27,24 +34,82 @@ const PasswordForm: React.FC<PasswordFormProps> = ({
         favorite: initialData?.favorite || false
     });
 
+    const [errors, setErrors] = useState<FormErrors>({});
     const [showPassword, setShowPassword] = useState(false);
+    const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+    const validateForm = (): boolean => {
+        const newErrors: FormErrors = {};
+        
+        // Title validation
+        if (!formData.title.trim()) {
+            newErrors.title = 'Title is required';
+        } else if (formData.title.length < 3) {
+            newErrors.title = 'Title must be at least 3 characters';
+        }
+
+        // Username validation
+        if (!formData.username.trim()) {
+            newErrors.username = 'Username is required';
+        }
+
+        // Password validation
+        if (!formData.password) {
+            newErrors.password = 'Password is required';
+        } else if (formData.password.length < 8) {
+            newErrors.password = 'Password must be at least 8 characters';
+        }
+
+        // Website URL validation (if provided)
+        if (formData.website_url && !formData.website_url.match(/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/)) {
+            newErrors.website_url = 'Please enter a valid URL';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
+        const newValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+        
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+            [name]: newValue
         }));
+
+        // Clear error when user starts typing
+        if (errors[name as keyof FormErrors]) {
+            setErrors(prev => ({
+                ...prev,
+                [name]: undefined
+            }));
+        }
+    };
+
+    const handleBlur = (fieldName: string) => {
+        setTouched(prev => ({
+            ...prev,
+            [fieldName]: true
+        }));
+        validateForm();
     };
 
     const handleGeneratePassword = () => {
         const newPassword = generateStrongPassword();
         setFormData(prev => ({ ...prev, password: newPassword }));
+        setErrors(prev => ({
+            ...prev,
+            password: undefined
+        }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await onSubmit(formData);
+        
+        if (validateForm()) {
+            await onSubmit(formData);
+        }
     };
 
     return (
@@ -54,6 +119,8 @@ const PasswordForm: React.FC<PasswordFormProps> = ({
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
+                onBlur={() => handleBlur('title')}
+                error={touched.title ? errors.title : undefined}
                 required
                 placeholder="e.g., Gmail Account"
             />
@@ -63,6 +130,8 @@ const PasswordForm: React.FC<PasswordFormProps> = ({
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
+                onBlur={() => handleBlur('username')}
+                error={touched.username ? errors.username : undefined}
                 required
                 placeholder="username@example.com"
             />
@@ -85,6 +154,8 @@ const PasswordForm: React.FC<PasswordFormProps> = ({
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
                     onChange={handleChange}
+                    onBlur={() => handleBlur('password')}
+                    error={touched.password ? errors.password : undefined}
                     required
                     showPasswordToggle
                 />
@@ -95,7 +166,10 @@ const PasswordForm: React.FC<PasswordFormProps> = ({
                 name="website_url"
                 value={formData.website_url}
                 onChange={handleChange}
+                onBlur={() => handleBlur('website_url')}
+                error={touched.website_url ? errors.website_url : undefined}
                 placeholder="https://example.com"
+                required
             />
 
             <div>
