@@ -71,6 +71,11 @@ export class VaultService {
         return this.decryptEntries(entries);
     }
 
+    static async getEntryById(id: string): Promise<IDecryptedPasswordEntry> {
+        const entry = await this.request<IPasswordEntry>(`/entries/${id}`);
+        return this.decryptEntry(entry);
+    }
+
     private static getMasterKey(): string {
         const masterKey = store.getState().auth.masterKey;
         if (!masterKey) {
@@ -99,20 +104,31 @@ export class VaultService {
         const masterKey = this.getMasterKey();
         
         try {
+            // Convert the data array to a Uint8Array
+            const usernameArray = new Uint8Array(entry.encrypted_username.data);
+            const passwordArray = new Uint8Array(entry.encrypted_password.data);
+            const notesArray = entry.encrypted_notes ? new Uint8Array(entry.encrypted_notes.data) : null;
+
+            // Use TextDecoder to convert Uint8Array to string
+            const textDecoder = new TextDecoder();
+            const username = textDecoder.decode(usernameArray);
+            const password = textDecoder.decode(passwordArray);
+            const notes = notesArray ? textDecoder.decode(notesArray) : null;
+
             return {
                 id: entry.id,
                 vault_id: entry.vault_id,
                 title: entry.title,
-                username: decryptData(entry.encrypted_username, masterKey),
-                password: decryptData(entry.encrypted_password, masterKey),
-                notes: entry.encrypted_notes ? decryptData(entry.encrypted_notes, masterKey) : undefined,
-                website_url: entry.website_url,
-                category: entry.category,
+                username: decryptData(username, masterKey),
+                password: decryptData(password, masterKey),
+                notes: notes ? decryptData(notes, masterKey) : undefined,
+                website_url: entry.website_url || '',
+                category: entry.category || '',
                 favorite: entry.favorite,
-                last_used: entry.last_used,
-                password_strength: entry.password_strength,
-                created_at: entry.created_at,
-                updated_at: entry.updated_at
+                last_used: entry.last_used ? new Date(entry.last_used) : undefined,
+                password_strength: entry.password_strength || 0,
+                created_at: new Date(entry.created_at),
+                updated_at: new Date(entry.updated_at)
             };
         } catch (error) {
             console.error('Decryption error:', error);

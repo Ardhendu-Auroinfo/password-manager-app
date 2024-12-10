@@ -9,6 +9,7 @@ import VaultPage from './pages/vault/VaultPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { VaultProvider } from './contexts/VaultContext';
 import { useAppSelector } from './hooks/useRedux';
+import { Toaster } from 'react-hot-toast';
 
 // Separate component for routes that uses Redux hooks
 const AppRoutes: React.FC = () => {
@@ -63,6 +64,7 @@ const App: React.FC = () => {
                     <AppRoutes />
                 </Router>
             </PersistGate>
+            <Toaster position="top-right" />
         </Provider>
     );
 };

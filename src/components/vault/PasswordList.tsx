@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { KeyIcon, EyeIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useVault } from '../../contexts/VaultContext';
 import { IDecryptedPasswordEntry } from '../../types/vault.types';
+import EditPasswordModal from './EditPasswordModal';
+import { VaultService } from '../../services/vault.service';
 
 const PasswordList: React.FC = () => {
     const { entries, loading, error, deleteEntry } = useVault();
+    const [selectedEntry, setSelectedEntry] = useState<IDecryptedPasswordEntry | null>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const handleCopyPassword = async (password: string) => {
         try {
@@ -13,6 +17,17 @@ const PasswordList: React.FC = () => {
         } catch (err) {
             console.error('Failed to copy password:', err);
             // TODO: Add error notification
+        }
+    };
+
+    const handleEdit = async (entryId: string) => {
+        try {
+            const entry = await VaultService.getEntryById(entryId);
+            setSelectedEntry(entry);
+            setIsEditModalOpen(true);
+        } catch (err) {
+            console.error('Failed to fetch entry:', err);
+            // Handle error (e.g., show notification)
         }
     };
 
@@ -43,58 +58,71 @@ const PasswordList: React.FC = () => {
     }
 
     return (
-        <div className="bg-white shadow overflow-hidden sm:rounded-md">
-            <ul className="divide-y divide-gray-200">
-                {entries.map((entry: IDecryptedPasswordEntry) => (
-                    <li key={entry.id}>
-                        <div className="px-4 py-4 flex items-center justify-between sm:px-6 hover:bg-gray-50">
-                            <div className="flex items-center min-w-0 flex-1">
-                                <div className="flex-shrink-0">
-                                    <KeyIcon className="h-6 w-6 text-gray-400" />
+        <>
+            <div className="bg-white shadow overflow-hidden sm:rounded-md">
+                <ul className="divide-y divide-gray-200">
+                    {entries.map((entry: IDecryptedPasswordEntry) => (
+                        <li key={entry.id}>
+                            <div className="px-4 py-4 flex items-center justify-between sm:px-6 hover:bg-gray-50">
+                                <div className="flex items-center min-w-0 flex-1">
+                                    <div className="flex-shrink-0">
+                                        <KeyIcon className="h-6 w-6 text-gray-400" />
+                                    </div>
+                                    <div className="ml-4">
+                                        <p className="font-medium text-gray-900">{entry.title}</p>
+                                        <p className="text-sm text-gray-500">{entry.username}</p>
+                                        {entry.website_url && (
+                                            <p className="text-sm text-gray-500">{entry.website_url}</p>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="ml-4">
-                                    <p className="font-medium text-gray-900">{entry.title}</p>
-                                    <p className="text-sm text-gray-500">{entry.username}</p>
-                                    {entry.website_url && (
-                                        <p className="text-sm text-gray-500">{entry.website_url}</p>
-                                    )}
+                                
+                                <div className="flex items-center space-x-4">
+                                    <button
+                                        onClick={() => handleCopyPassword(entry.password)}
+                                        className="text-gray-400 hover:text-gray-500"
+                                        title="Copy password"
+                                    >
+                                        <EyeIcon className="h-5 w-5" />
+                                    </button>
+                                    
+                                    <button
+                                        onClick={() => handleEdit(entry.id)}
+                                        className="text-gray-400 hover:text-gray-500"
+                                        title="Edit entry"
+                                    >
+                                        <PencilIcon className="h-5 w-5" />
+                                    </button>
+                                    
+                                    <button
+                                        onClick={() => {
+                                            if (window.confirm('Are you sure you want to delete this password?')) {
+                                                deleteEntry(entry.id);
+                                            }
+                                        }}
+                                        className="text-gray-400 hover:text-red-500"
+                                        title="Delete entry"
+                                    >
+                                        <TrashIcon className="h-5 w-5" />
+                                    </button>
                                 </div>
                             </div>
-                            
-                            <div className="flex items-center space-x-4">
-                                <button
-                                    onClick={() => handleCopyPassword(entry.password)}
-                                    className="text-gray-400 hover:text-gray-500"
-                                    title="Copy password"
-                                >
-                                    <EyeIcon className="h-5 w-5" />
-                                </button>
-                                
-                                <button
-                                    onClick={() => {/* TODO: Implement edit */}}
-                                    className="text-gray-400 hover:text-gray-500"
-                                    title="Edit entry"
-                                >
-                                    <PencilIcon className="h-5 w-5" />
-                                </button>
-                                
-                                <button
-                                    onClick={() => {
-                                        if (window.confirm('Are you sure you want to delete this password?')) {
-                                            deleteEntry(entry.id);
-                                        }
-                                    }}
-                                    className="text-gray-400 hover:text-red-500"
-                                    title="Delete entry"
-                                >
-                                    <TrashIcon className="h-5 w-5" />
-                                </button>
-                            </div>
-                        </div>
-                    </li>
-                ))}
-            </ul>
-        </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            {selectedEntry && (
+                <EditPasswordModal
+                    entry={selectedEntry}
+                    isOpen={isEditModalOpen}
+                    onClose={() => {
+                        setIsEditModalOpen(false);
+                        setSelectedEntry(null);
+                    }}
+                />
+            )}
+        </>
     );
 };
 

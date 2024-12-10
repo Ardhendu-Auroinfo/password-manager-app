@@ -20,7 +20,13 @@ export const decryptData = (encryptedData: string, key: string | null): string =
 
     try {
         const bytes = CryptoJS.AES.decrypt(encryptedData, key);
-        return bytes.toString(CryptoJS.enc.Utf8);
+        const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+        
+        if (!decrypted) {
+            throw new Error('Decryption failed - invalid result');
+        }
+        
+        return decrypted;
     } catch (error) {
         console.error('Decryption error:', error);
         throw new Error('Failed to decrypt data');

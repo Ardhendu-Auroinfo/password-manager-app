@@ -5,20 +5,25 @@ export interface IVault {
     updated_at: Date;
 }
 
+export interface EncryptedBuffer {
+    type: string;
+    data: number[];
+}
+
 export interface IPasswordEntry {
     id: string;
     vault_id: string;
     title: string;
-    encrypted_username: string;
-    encrypted_password: string;
-    encrypted_notes?: string;
-    website_url?: string;
-    category: string;
+    encrypted_username: EncryptedBuffer;
+    encrypted_password: EncryptedBuffer;
+    encrypted_notes: EncryptedBuffer | null;
+    website_url: string | null;
+    category: string | null;
     favorite: boolean;
-    last_used?: Date;
-    password_strength: number;
-    created_at: Date;
-    updated_at: Date;
+    last_used: string | null;
+    password_strength: number | null;
+    created_at: string;
+    updated_at: string;
 }
 
 // For frontend use (decrypted data)
