@@ -1,10 +1,17 @@
 import { store } from '../store';
 import { IPasswordEntry, IDecryptedPasswordEntry, ICreatePasswordEntry } from '../types/vault.types';
 import { encryptData, decryptData } from '../utils/encryption';
+import { config } from '../extension/config';
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = config.API_URL;
 
 export class VaultService {
+    private baseUrl: string;
+
+    constructor() {
+        this.baseUrl = API_URL;
+    }
+
     private static async request<T>(
         endpoint: string,
         method: string = 'GET',
@@ -140,3 +147,5 @@ export class VaultService {
         return entries.map(entry => this.decryptEntry(entry));
     }
 }
+
+export const vaultService = new VaultService();

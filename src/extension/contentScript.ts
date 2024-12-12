@@ -1,5 +1,7 @@
 export {};
 
+console.log('Content script loaded');
+
 const findLoginForm = () => {
     const usernameInput = document.querySelector('input[type="text"], input[type="email"]') as HTMLInputElement | null;
     const passwordInput = document.querySelector('input[type="password"]') as HTMLInputElement | null;
@@ -10,19 +12,16 @@ const findLoginForm = () => {
     };
 };
 
-chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'FILL_CREDENTIALS') {
         const { usernameField, passwordField } = findLoginForm();
         
-        if (usernameField instanceof HTMLInputElement && passwordField instanceof HTMLInputElement) {
+        if (usernameField && passwordField) {
             usernameField.value = message.username;
             passwordField.value = message.password;
             
             usernameField.dispatchEvent(new Event('input', { bubbles: true }));
             passwordField.dispatchEvent(new Event('input', { bubbles: true }));
-            
-            usernameField.dispatchEvent(new Event('change', { bubbles: true }));
-            passwordField.dispatchEvent(new Event('change', { bubbles: true }));
             
             sendResponse({ success: true });
         } else {

@@ -31,6 +31,7 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         } catch (err) {
             console.error('Error fetching entries:', err);
             setError('Failed to fetch entries');
+            setLoading(false);
         } finally {
             setLoading(false);
         }
@@ -85,6 +86,7 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             setError(null);
             const searchResults = await VaultService.searchEntries(query);
             setEntries(searchResults);
+            setLoading(false);
         } catch (err) {
             setError('Failed to search entries');
             console.error(err);

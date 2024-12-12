@@ -2,28 +2,28 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { store } from '../../store';
+import { AuthProvider } from '../../contexts/AuthContext';
+import { VaultProvider } from '../../contexts/VaultContext';
 import Popup from './Popup';
-import '../../index.css'; // If you want to use your existing styles
+import '../index.css';
 
-// Wait for the DOM to be loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Get the root element from popup.html
+    console.log('DOM Content Loaded');
     const container = document.getElementById('root');
     
     if (!container) {
+        console.error('Root element not found');
         throw new Error('Root element not found');
     }
 
-    // Create a root
     const root = createRoot(container);
 
-    // Render the Popup component
     root.render(
         <React.StrictMode>
             <Provider store={store}>
-                <div className="w-96 min-h-[400px] bg-white">
-                    <Popup />
-                </div>
+                    <VaultProvider>
+                        <Popup />
+                    </VaultProvider>
             </Provider>
         </React.StrictMode>
     );

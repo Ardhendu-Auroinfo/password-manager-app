@@ -11,6 +11,12 @@ interface AuthState {
     error: string | null;
 }
 
+interface AuthCredentials {
+    user: IUser;
+    token: string;
+    masterKey: string;
+}
+
 // Define RehydrateAction type
 interface RehydrateAction {
     type: typeof REHYDRATE;
@@ -35,17 +41,23 @@ const authSlice = createSlice({
     reducers: {
         setCredentials: (
             state,
-            action: PayloadAction<{
-                user: IUser;
-                token: string;
-                masterKey: string;
-            }>
+            action: PayloadAction<AuthCredentials | null>
         ) => {
-            const { user, token, masterKey } = action.payload;
-            state.user = user;
-            state.token = token;
-            state.masterKey = masterKey;
-            state.isAuthenticated = true;
+            if (action.payload === null) {
+                // Reset to initial state when payload is null
+                state.user = null;
+                state.token = null;
+                state.masterKey = null;
+                state.isAuthenticated = false;
+                state.error = null;
+            } else {
+                const { user, token, masterKey } = action.payload;
+                state.user = user;
+                state.token = token;
+                state.masterKey = masterKey;
+                state.isAuthenticated = true;
+                state.error = null;
+            }
         },
         setLoading: (state, action: PayloadAction<boolean>) => {
             state.loading = action.payload;
@@ -54,6 +66,7 @@ const authSlice = createSlice({
             state.error = action.payload;
         },
         logout: (state) => {
+            // Reset to initial state
             state.user = null;
             state.token = null;
             state.masterKey = null;

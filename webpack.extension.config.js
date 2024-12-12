@@ -13,16 +13,13 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'dist-extension'),
         filename: '[name].js',
-        clean: true,
+        clean: true
     },
     resolve: {
         extensions: ['.ts', '.tsx', '.js', '.jsx'],
         alias: {
             '@': path.resolve(__dirname, 'src'),
         },
-        fallback: {
-            "process": false
-        }
     },
     module: {
         rules: [
@@ -32,9 +29,8 @@ module.exports = {
                     {
                         loader: 'ts-loader',
                         options: {
-                            compilerOptions: {
-                                noEmit: false,
-                            },
+                            configFile: 'tsconfig.extension.json',
+                            transpileOnly: true
                         },
                     },
                 ],
@@ -59,13 +55,7 @@ module.exports = {
             ],
         }),
         new webpack.DefinePlugin({
-            'process.env': JSON.stringify({
-                NODE_ENV: process.env.NODE_ENV || 'development',
-                API_URL: 'http://localhost:5000'
-            })
+            'process.env.REACT_APP_API_URL': JSON.stringify('http://localhost:5000/api')
         })
     ],
-    optimization: {
-        minimize: false,
-    },
 };
