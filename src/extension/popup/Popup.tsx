@@ -1,16 +1,57 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useVault } from '../../contexts/VaultContext';
+import { VaultService } from '../../services/vault.service';
+import { IDecryptedPasswordEntry, ICreatePasswordEntry } from '../../types/vault.types';
 import { getBrowserAPI } from '../../utils/browser';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../../store/slices/authSlice';
+import LoginView from './components/LoginView';
+import PasswordEntry from './components/PasswordEntry';
+import ExtensionPasswordForm from './components/ExtensionPasswordForm';
 import './popup.css';
+interface DropdownState {
+    [key: string]: boolean;
+}
 
 const Popup: React.FC = () => {
     const [currentUrl, setCurrentUrl] = useState<string>('');
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [showEditForm, setShowEditForm] = useState(false);
+    const [selectedEntry, setSelectedEntry] = useState<IDecryptedPasswordEntry | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
     const { isAuthenticated, user } = useAuth();
-    const { entries, loading } = useVault();
+    const [isLoading, setIsLoading] = useState(false);
+
+    const { entries, loading, refreshEntries } = useVault();
     const dispatch = useDispatch();
+
+    // Form state for add/edit
+    const [formData, setFormData] = useState<ICreatePasswordEntry>({
+        title: '',
+        username: '',
+        password: '',
+        website_url: '',
+        notes: '',
+        category: '',
+        favorite: false
+    });
+
+    const [openDropdown, setOpenDropdown] = useState<DropdownState>({});
+
+    // Function to toggle dropdown
+    const toggleDropdown = (entryId: string) => {
+        setOpenDropdown(prev => ({
+            ...Object.keys(prev).reduce((acc, key) => ({ ...acc, [key]: false }), {}),
+            [entryId]: !prev[entryId]
+        }));
+    };
+
+    // Function to close all dropdowns
+    const closeAllDropdowns = () => {
+        setOpenDropdown({});
+    };
+
 
     useEffect(() => {
         const initializeAuth = async () => {
@@ -61,13 +102,105 @@ const Popup: React.FC = () => {
         });
     }, []);
 
-    // if (loading) {
-    //     return (
-    //         <div className="w-80 h-96 flex items-center justify-center bg-white">
-    //             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-    //         </div>
-    //     );
-    // }
+    const filteredEntries = entries.filter(entry => 
+        entry.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        entry.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        entry.website_url?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    // Sort entries by most recent first
+    const sortedEntries = [...filteredEntries].sort(
+        (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+    );
+
+
+    // const handleAddEntry = async (e: React.FormEvent) => {
+    //     e.preventDefault();
+    //     try {
+    //         await VaultService.createEntry(formData);
+    //         await refreshEntries();
+    //         setShowAddForm(false);
+    //         setFormData({
+    //             title: '',
+    //             username: '',
+    //             password: '',
+    //             website_url: '',
+    //             notes: '',
+    //             category: '',
+    //             favorite: false
+    //         });
+    //     } catch (error) {
+    //         console.error('Failed to add entry:', error);
+    //     }
+    // };
+    const handleAddEntry = async (data: ICreatePasswordEntry) => {
+        try {
+            setIsLoading(true);
+            await VaultService.createEntry(data);
+            await refreshEntries();
+            setShowAddForm(false);
+        } catch (error) {
+            console.error('Failed to add entry:', error);
+            // Handle error (show toast notification)
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    const handleEditEntry = async (data: ICreatePasswordEntry) => {
+        if (!selectedEntry) return;
+
+        try {
+            setIsLoading(true);
+            await VaultService.updateEntry(selectedEntry.id, data);
+            await refreshEntries();
+            setShowEditForm(false);
+            setSelectedEntry(null);
+        } catch (error) {
+            console.error('Failed to update entry:', error);
+            // Handle error (show toast notification)
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // const handleEditEntry = async (e: React.FormEvent) => {
+    //     e.preventDefault();
+    //     if (!selectedEntry) return;
+
+    //     try {
+    //         await VaultService.updateEntry(selectedEntry.id, formData);
+    //         await refreshEntries();
+    //         setShowEditForm(false);
+    //         setSelectedEntry(null);
+    //     } catch (error) {
+    //         console.error('Failed to update entry:', error);
+    //     }
+    // };
+
+    // const handleDeleteEntry = async (id: string) => {
+    //     if (window.confirm('Are you sure you want to delete this entry?')) {
+    //         try {
+    //             await VaultService.deleteEntry(id);
+    //             await refreshEntries();
+    //         } catch (error) {
+    //             console.error('Failed to delete entry:', error);
+    //         }
+    //     }
+    // };
+
+    const handleDeleteEntry = async (id: string) => {
+        if (window.confirm('Are you sure you want to delete this password?')) {
+            try {
+                setIsLoading(true);
+                await VaultService.deleteEntry(id);
+                await refreshEntries();
+            } catch (error) {
+                console.error('Failed to delete entry:', error);
+                // Handle error (show toast notification)
+            } finally {
+                setIsLoading(false);
+            }
+        }
+    };
 
     if (!isAuthenticated) {
         return (
@@ -110,96 +243,175 @@ const Popup: React.FC = () => {
         );
     }
 
+    // Entry Form Component
+    // const EntryForm = ({ isEdit = false }) => (
+    //     <form onSubmit={isEdit ? handleEditEntry : handleAddEntry} className="p-4 space-y-4">
+    //         <div>
+    //             <input
+    //                 type="text"
+    //                 placeholder="Title"
+    //                 value={formData.title}
+    //                 onChange={e => setFormData({ ...formData, title: e.target.value })}
+    //                 className="w-full px-3 py-2 border rounded-md"
+    //                 required
+    //             />
+    //         </div>
+    //         <div>
+    //             <input
+    //                 type="text"
+    //                 placeholder="Username"
+    //                 value={formData.username}
+    //                 onChange={e => setFormData({ ...formData, username: e.target.value })}
+    //                 className="w-full px-3 py-2 border rounded-md"
+    //                 required
+    //             />
+    //         </div>
+    //         <div>
+    //             <input
+    //                 type="password"
+    //                 placeholder="Password"
+    //                 value={formData.password}
+    //                 onChange={e => setFormData({ ...formData, password: e.target.value })}
+    //                 className="w-full px-3 py-2 border rounded-md"
+    //                 required
+    //             />
+    //         </div>
+    //         <div>
+    //             <input
+    //                 type="url"
+    //                 placeholder="Website URL"
+    //                 value={formData.website_url}
+    //                 onChange={e => setFormData({ ...formData, website_url: e.target.value })}
+    //                 className="w-full px-3 py-2 border rounded-md"
+    //             />
+    //         </div>
+    //         <div>
+    //             <textarea
+    //                 placeholder="Notes"
+    //                 value={formData.notes}
+    //                 onChange={e => setFormData({ ...formData, notes: e.target.value })}
+    //                 className="w-full px-3 py-2 border rounded-md"
+    //             />
+    //         </div>
+    //         <div className="flex justify-end space-x-2">
+    //             <button
+    //                 type="button"
+    //                 onClick={() => isEdit ? setShowEditForm(false) : setShowAddForm(false)}
+    //                 className="px-4 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200"
+    //             >
+    //                 Cancel
+    //             </button>
+    //             <button
+    //                 type="submit"
+    //                 className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
+    //             >
+    //                 {isEdit ? 'Update' : 'Add'}
+    //             </button>
+    //         </div>
+    //     </form>
+    // );
+
+    
     return (
-        <div className="w-80 h-96 bg-white flex flex-col">
-            {/* Header */}
-            <div className="p-4 bg-white border-b">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                        <div className="bg-blue-500 p-2 rounded-full">
-                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <h2 className="text-sm font-semibold text-gray-800">Password Manager</h2>
-                            <p className="text-xs text-gray-500">{user?.email}</p>
-                        </div>
-                    </div>
-                    <button 
-                        className="text-gray-500 hover:text-gray-700"
-                        onClick={() => chrome.tabs.create({ url: 'http://localhost:3000/settings' })}
+        <div className="w-80 h-[600px] bg-white flex flex-col">
+            {/* Fixed Header */}
+            <div className="flex-shrink-0 p-4 bg-white border-b">
+                <div className="relative">
+                    <input
+                        type="text"
+                        placeholder="Search passwords..."
+                        value={searchQuery}
+                        onChange={e => setSearchQuery(e.target.value)}
+                        className="w-full px-3 py-2 pl-10 pr-4 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <svg 
+                        className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
                     >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-            {/* Current Site Section */}
-            {currentUrl && (
-                <div className="p-4 border-b bg-gray-50">
-                    <h3 className="text-sm font-medium text-gray-700 mb-2">
-                        Current Site
-                    </h3>
-                    <div className="flex items-center space-x-2">
-                        <img 
-                            src={`https://www.google.com/s2/favicons?domain=${currentUrl}`}
-                            alt="Site favicon"
-                            className="w-4 h-4"
+                        <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth={2} 
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
                         />
-                        <span className="text-sm text-gray-600">{currentUrl}</span>
-                    </div>
-                </div>
-            )}
-
-            {/* Passwords List */}
-            <div className="flex-1 overflow-auto p-4">
-                <div className="space-y-2">
-                    {entries
-                        .filter(entry => entry.website_url?.includes(currentUrl))
-                        .map(entry => (
-                            <div 
-                                key={entry.id}
-                                className="p-3 bg-white border rounded-lg hover:shadow-md transition-shadow duration-200"
-                            >
-                                <div className="flex justify-between items-center">
-                                    <div>
-                                        <h4 className="font-medium text-gray-800">{entry.title}</h4>
-                                        <p className="text-sm text-gray-500">{entry.username}</p>
-                                    </div>
-                                    <button
-                                        onClick={() => {
-                                            chrome.tabs.query(
-                                                { active: true, currentWindow: true },
-                                                (tabs) => {
-                                                    if (tabs[0]?.id) {
-                                                        chrome.tabs.sendMessage(
-                                                            tabs[0].id,
-                                                            {
-                                                                type: 'FILL_CREDENTIALS',
-                                                                username: entry.username,
-                                                                password: entry.password
-                                                            }
-                                                        );
-                                                    }
-                                                }
-                                            );
-                                        }}
-                                        className="px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 transition-colors duration-200"
-                                    >
-                                        Fill
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
+                    </svg>
                 </div>
             </div>
 
-            {/* Footer */}
-            <div className="p-4 border-t">
+            {/* Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto min-h-0">
+                {showAddForm && (
+                    <div className="p-4">
+                        <ExtensionPasswordForm
+                            onSubmit={handleAddEntry}
+                            onCancel={() => setShowAddForm(false)}
+                            isLoading={isLoading}
+                        />
+                    </div>
+                )}
+                
+                {showEditForm && selectedEntry && (
+                    <div className="p-4">
+                        <ExtensionPasswordForm
+                            initialData={selectedEntry}
+                            onSubmit={handleEditEntry}
+                            onCancel={() => {
+                                setShowEditForm(false);
+                                setSelectedEntry(null);
+                            }}
+                            isLoading={isLoading}
+                        />
+                    </div>
+                )}
+
+                {/* Password List */}
+                {!showAddForm && !showEditForm && (
+                    <div className="p-4">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-medium text-gray-900">
+                                Passwords
+                            </h3>
+                            <button
+                                onClick={() => setShowAddForm(true)}
+                                className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            >
+                                Add New
+                            </button>
+                        </div>
+
+                        {loading ? (
+                            <div className="flex justify-center items-center h-32">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                            </div>
+                        ) : sortedEntries.length === 0 ? (
+                            <div className="text-center py-8 text-gray-500">
+                                {searchQuery ? 'No passwords found' : 'No passwords saved yet'}
+                            </div>
+                        ) : (
+                            <div className="space-y-2">
+                                {sortedEntries.map(entry => (
+                                    <PasswordEntry
+                                        key={entry.id}
+                                        entry={entry}
+                                        onEdit={(entry) => {
+                                            setSelectedEntry(entry);
+                                            setShowEditForm(true);
+                                        }}
+                                        onDelete={handleDeleteEntry}
+                                        isDropdownOpen={!!openDropdown[entry.id]}
+                                        onToggleDropdown={(id) => toggleDropdown(id)}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {/* Fixed Footer */}
+            <div className="flex-shrink-0 p-4 border-t bg-white">
                 <button 
                     onClick={() => chrome.tabs.create({ url: 'http://localhost:3000/vault' })}
                     className="w-full flex items-center justify-center space-x-2 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors duration-200"
