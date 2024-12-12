@@ -5,7 +5,6 @@ import { store } from '../../store';
 import { AuthProvider } from '../../contexts/AuthContext';
 import { VaultProvider } from '../../contexts/VaultContext';
 import Popup from './Popup';
-import '../index.css';
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM Content Loaded');

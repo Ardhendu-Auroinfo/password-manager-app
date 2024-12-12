@@ -4,6 +4,7 @@ import { useVault } from '../../contexts/VaultContext';
 import { getBrowserAPI } from '../../utils/browser';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../../store/slices/authSlice';
+import './popup.css';
 
 const Popup: React.FC = () => {
     const [currentUrl, setCurrentUrl] = useState<string>('');

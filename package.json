@@ -29,6 +29,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "build:extension-css": "tailwindcss -i src/extension/popup/popup.css -o extension/popup.css",
+    "watch:extension-css": "tailwindcss -i src/extension/popup/popup.css -o extension/popup.css --watch",
     "build:extension": "webpack --config webpack.extension.config.js",
     "dev:extension": "webpack --watch --config webpack.extension.config.js"
   },
