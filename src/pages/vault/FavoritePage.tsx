@@ -4,8 +4,9 @@ import VaultHeader from '../../components/vault/VaultHeader';
 import PasswordList from '../../components/vault/PasswordList';
 import { useVault } from '../../contexts/VaultContext';
 
-const VaultPage: React.FC = () => {
-    const { entries } = useVault();
+const FavoritePage: React.FC = () => {
+    const { favoriteEntries } = useVault();
+
 
     return (
         <div className="h-screen flex overflow-hidden bg-gray-100">
@@ -19,7 +20,7 @@ const VaultPage: React.FC = () => {
                 <main className="flex-1 relative overflow-y-auto focus:outline-none">
                     <div className="py-6">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                            <PasswordList entries={entries} />
+                            <PasswordList entries={favoriteEntries} />
                         </div>
                     </div>
                 </main>
@@ -28,4 +29,4 @@ const VaultPage: React.FC = () => {
     );
 };
 
-export default VaultPage;
+export default FavoritePage;

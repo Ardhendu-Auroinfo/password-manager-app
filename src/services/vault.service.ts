@@ -54,6 +54,11 @@ export class VaultService {
         return this.decryptEntries(entries);
     }
 
+    static async getFavoriteEntries(): Promise<IDecryptedPasswordEntry[]> {
+        const entries = await this.request<IPasswordEntry[]>('/entries/favorites');
+        return this.decryptEntries(entries);
+    }
+
     static async createEntry(entry: ICreatePasswordEntry): Promise<IDecryptedPasswordEntry> {
         const encryptedEntry = this.encryptEntry(entry);
         const response = await this.request<IPasswordEntry>('/entries', 'POST', encryptedEntry);

@@ -10,6 +10,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import { VaultProvider } from './contexts/VaultContext';
 import { useAppSelector } from './hooks/useRedux';
 import { Toaster } from 'react-hot-toast';
+import FavoritePage from './pages/vault/FavoritePage';
 
 // Separate component for routes that uses Redux hooks
 const AppRoutes: React.FC = () => {
@@ -32,6 +33,12 @@ const AppRoutes: React.FC = () => {
                 <Route path="/vault" element={
                     <ProtectedRoute>
                         <VaultPage />
+                    </ProtectedRoute>
+                } />
+
+                <Route path="/favorites" element={
+                    <ProtectedRoute>
+                        <FavoritePage />
                     </ProtectedRoute>
                 } />
 

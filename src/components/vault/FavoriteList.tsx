@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { KeyIcon, EyeIcon, PencilIcon, TrashIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
 import { useVault } from '../../contexts/VaultContext';
 import { IDecryptedPasswordEntry } from '../../types/vault.types';
@@ -6,10 +6,21 @@ import EditPasswordModal from './EditPasswordModal';
 import { VaultService } from '../../services/vault.service';
 import { toast } from 'react-hot-toast';
 
-const PasswordList: React.FC<{ entries: IDecryptedPasswordEntry[] }> = ({ entries }) => {
-    const { loading, error, deleteEntry } = useVault();
+const FavoriteList: React.FC = () => {
+    const { entries, loading, error, refreshFavoriteEntries, deleteEntry } = useVault();
     const [selectedEntry, setSelectedEntry] = useState<IDecryptedPasswordEntry | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                await refreshFavoriteEntries();
+            } catch (err) {
+                console.error('Error fetching favorites:', err);
+            }
+        };
+        fetchData();
+    }, []);
 
     const handleCopyPassword = async (password: string) => {
         try {
@@ -28,7 +39,7 @@ const PasswordList: React.FC<{ entries: IDecryptedPasswordEntry[] }> = ({ entrie
             setIsEditModalOpen(true);
         } catch (err) {
             console.error('Failed to fetch entry:', err);
-            // Handle error (e.g., show notification)
+            toast.error('Failed to fetch entry details');
         }
     };
 
@@ -71,8 +82,8 @@ const PasswordList: React.FC<{ entries: IDecryptedPasswordEntry[] }> = ({ entrie
         return (
             <div className="text-center py-8">
                 <KeyIcon className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No passwords</h3>
-                <p className="mt-1 text-sm text-gray-500">Get started by creating a new password entry.</p>
+                <h3 className="mt-2 text-sm font-medium text-gray-900">No favorite passwords</h3>
+                <p className="mt-1 text-sm text-gray-500">Mark some passwords as favorites to see them here.</p>
             </div>
         );
     }
@@ -98,17 +109,7 @@ const PasswordList: React.FC<{ entries: IDecryptedPasswordEntry[] }> = ({ entrie
                                 </div>
                                 
                                 <div className="flex items-center space-x-4">
-                                {entry.favorite && (
-                                    <svg
-                                        className="w-6 h-6 text-yellow-400"
-                                        fill="currentColor"
-                                        viewBox="0 0 20 20"
-                                    >
-                                        <path
-                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-                                        />
-                                    </svg>
-                                )}
+                                
                                     {entry.website_url && (
                                         <button
                                             onClick={() => handleWebsiteLaunch(entry)}
@@ -167,4 +168,4 @@ const PasswordList: React.FC<{ entries: IDecryptedPasswordEntry[] }> = ({ entrie
     );
 };
 
-export default PasswordList;
+export default FavoriteList;
