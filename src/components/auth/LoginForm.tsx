@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ILoginCredentials } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
 import Button from '../common/Button';
@@ -64,9 +64,9 @@ const LoginForm: React.FC = () => {
                 </div>
 
                 <div className="text-sm">
-                    <a href="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
+                    <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
                         Forgot your password?
-                    </a>
+                    </Link>
                 </div>
             </div>
             {error && <div className="error">{error}</div>}

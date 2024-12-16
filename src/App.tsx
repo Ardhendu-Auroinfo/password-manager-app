@@ -11,6 +11,8 @@ import { VaultProvider } from './contexts/VaultContext';
 import { useAppSelector } from './hooks/useRedux';
 import { Toaster } from 'react-hot-toast';
 import FavoritePage from './pages/vault/FavoritePage';
+import ForgotPasswordForm from './components/auth/ForgotPasswordForm';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 
 // Separate component for routes that uses Redux hooks
 const AppRoutes: React.FC = () => {
@@ -57,6 +59,7 @@ const AppRoutes: React.FC = () => {
                         </div>
                     </div>
                 } />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             </Routes>
         </VaultProvider>
     );
