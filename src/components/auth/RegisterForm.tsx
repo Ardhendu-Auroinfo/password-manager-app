@@ -78,7 +78,7 @@ const RegisterForm: React.FC = () => {
                 value={credentials.email}
                 onChange={handleChange}
                 required
-                error={error?.field === 'email' ? error.message : ''}
+                // error={error?.field === 'email' ? error.message : ''}
             />
 
             <div>
@@ -101,7 +101,7 @@ const RegisterForm: React.FC = () => {
                     onChange={handleChange}
                     required
                     showPasswordToggle
-                    error={validationErrors.password || (error?.field === 'password' ? error.message : '')}
+                    // error={validationErrors.password || (error?.field === 'password' ? error.message : '')}
                 />
                 {credentials.password && (
                     <PasswordStrengthMeter 
@@ -131,6 +131,7 @@ const RegisterForm: React.FC = () => {
                 value={credentials.masterPasswordHint}
                 onChange={handleChange}
             />
+            {error && <div className="error">{error}</div>}
 
             <Button
                 type="submit"

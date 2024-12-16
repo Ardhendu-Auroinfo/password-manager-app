@@ -24,7 +24,7 @@ const LoginForm: React.FC = () => {
         e.preventDefault();
         const success = await login(credentials);
         if (success) {
-            navigate('/dashboard');
+            navigate('/vault');
         }
     };
 
@@ -37,7 +37,7 @@ const LoginForm: React.FC = () => {
                 value={credentials.email}
                 onChange={handleChange}
                 required
-                error={error?.field === 'email' ? error.message : ''}
+                // error={error?.field === 'email' ? error.message : ''}
             />
 
             <Input
@@ -47,7 +47,7 @@ const LoginForm: React.FC = () => {
                 value={credentials.password}
                 onChange={handleChange}
                 required
-                error={error?.field === 'password' ? error.message : ''}
+                // error={error?.field === 'password' ? error.message : ''}
             />
 
             <div className="flex items-center justify-between">
@@ -69,14 +69,16 @@ const LoginForm: React.FC = () => {
                     </a>
                 </div>
             </div>
+            {error && <div className="error">{error}</div>}
 
             <Button
                 type="submit"
                 fullWidth
                 loading={loading}
             >
-                Sign in
+                {loading ? 'Signing in...' : 'Sign in'} 
             </Button>
+           
         </form>
     );
 };

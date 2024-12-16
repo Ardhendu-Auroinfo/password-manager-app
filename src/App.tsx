@@ -1,42 +1,54 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './store';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
+import VaultPage from './pages/vault/VaultPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
-import { useAuth } from './hooks/useAuth';
+import { VaultProvider } from './contexts/VaultContext';
+import { useAppSelector } from './hooks/useRedux';
+import { Toaster } from 'react-hot-toast';
+import FavoritePage from './pages/vault/FavoritePage';
 
-const App: React.FC = () => {
-    const { getCurrentUser } = useAuth();
-    const user = getCurrentUser();
+// Separate component for routes that uses Redux hooks
+const AppRoutes: React.FC = () => {
+    const { user } = useAppSelector((state) => state.auth);
 
     return (
-        <Router>
+        <VaultProvider>
             <Routes>
                 {/* Public Routes */}
-                <Route>
-                    <Route 
-                        path="/login" 
-                        element={user ? <Navigate to="/dashboard" replace /> : <LoginPage />} 
-                    />
-                    <Route 
-                        path="/register" 
-                        element={user ? <Navigate to="/dashboard" replace /> : <RegisterPage />} 
-                    />
-                </Route>
+                <Route 
+                    path="/login" 
+                    element={user ? <Navigate to="/vault" replace /> : <LoginPage />} 
+                />
+                <Route 
+                    path="/register" 
+                    element={user ? <Navigate to="/vault" replace /> : <RegisterPage />} 
+                />
 
                 {/* Protected Routes */}
-                {/* <Route path="/dashboard" element={
+                <Route path="/vault" element={
                     <ProtectedRoute>
-                        
+                        <VaultPage />
                     </ProtectedRoute>
-                } /> */}
+                } />
+
+                <Route path="/favorites" element={
+                    <ProtectedRoute>
+                        <FavoritePage />
+                    </ProtectedRoute>
+                } />
 
                 {/* Redirect root to appropriate page */}
                 <Route 
                     path="/" 
-                    element={<Navigate to={user ? "/dashboard" : "/login"} replace />} 
+                    element={<Navigate to={user ? "/vault" : "/login"} replace />} 
                 />
 
-                {/* 404 Page - Optional */}
+                {/* 404 Page */}
                 <Route path="*" element={
                     <div className="min-h-screen flex items-center justify-center">
                         <div className="text-center">
@@ -46,7 +58,21 @@ const App: React.FC = () => {
                     </div>
                 } />
             </Routes>
-        </Router>
+        </VaultProvider>
+    );
+};
+
+// Main App component that provides Redux store
+const App: React.FC = () => {
+    return (
+        <Provider store={store}>
+            <PersistGate loading={null} persistor={persistor}>
+                <Router>
+                    <AppRoutes />
+                </Router>
+            </PersistGate>
+            <Toaster position="top-right" />
+        </Provider>
     );
 };
 

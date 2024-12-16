@@ -1,21 +1,23 @@
-import { Navigate, useLocation } from 'react-router-dom';
+import React from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 
-interface ProtectedRouteProps {
-    children: JSX.Element;
-}
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { isAuthenticated, loading } = useAuth();
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-    const { getCurrentUser } = useAuth();
-    const location = useLocation();
-    const user = getCurrentUser();
-
-    if (!user) {
-        // Redirect to login page but save the attempted URL
-        return <Navigate to="/login" state={{ from: location }} replace />;
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+            </div>
+        );
     }
 
-    return children;
+    if (!isAuthenticated) {
+        return <Navigate to="/login" replace />;
+    }
+
+    return <>{children}</>;
 };
 
 export default ProtectedRoute;
