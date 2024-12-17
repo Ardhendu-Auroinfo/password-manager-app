@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthService } from '../../services/auth.service';
 import Input from '../common/Input';
 import Button from '../common/Button';
 
 const ForgotPasswordForm: React.FC = () => {
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
@@ -30,6 +31,38 @@ const ForgotPasswordForm: React.FC = () => {
             }
         } catch (err: any) {
             setError(err.response?.data?.message || 'Failed to get password hint');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleResetPassword = async () => {
+        if (!email) {
+            setError('Please enter your email address');
+            return;
+        }
+
+        setLoading(true);
+        setError('');
+        setMessage('');
+
+        try {
+            const response = await AuthService.requestPasswordReset(email);
+            if (response.success) {
+                // Store email in sessionStorage for the recovery page
+                sessionStorage.setItem('recovery_email', email);
+                // Navigate to recovery page
+                navigate('/account-recovery', { 
+                    state: { 
+                        email,
+                        message: 'Recovery code has been sent to your email' 
+                    }
+                });
+            } else {
+                setError(response.message);
+            }
+        } catch (err: any) {
+            setError(err.response?.data?.message || 'Failed to initiate password reset');
         } finally {
             setLoading(false);
         }
@@ -74,9 +107,10 @@ const ForgotPasswordForm: React.FC = () => {
                     <Button
                         type="button"
                         fullWidth
+                        onClick={handleResetPassword}
                         loading={loading}
                     >
-                        {loading ? 'Sending...' : 'Send reset instructions'}
+                        {loading ? 'Sending Recovery Code...' : 'Reset Password'}
                     </Button>
 
                     <div className="text-center">

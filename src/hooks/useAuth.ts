@@ -91,12 +91,19 @@ export const useAuth = () => {
                     console.error('Failed to sync with extension, but login successful:', error);
                 }
                 
-                return true;
+                return { success: true };
             }
-            return false;
-        } catch (error) {
-            console.error('Login error:', error);
-            return false;
+            return { 
+                success: false, 
+                error: response.message || 'Login failed' 
+            };
+        } catch (err: any) {
+            const errorMessage = err.response?.data?.message || 'An error occurred during login';
+            console.error('Login error:', err);
+            return { 
+                success: false, 
+                error: errorMessage 
+            };
         }
     };
 
