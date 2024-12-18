@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ILoginCredentials } from '../../types';
 import { useAuth } from '../../hooks/useAuth';
 import Button from '../common/Button';
@@ -7,24 +7,36 @@ import Input from '../common/Input';
 
 const LoginForm: React.FC = () => {
     const navigate = useNavigate();
-    const { login, loading, error } = useAuth();
+    const { login, loading } = useAuth();
     const [credentials, setCredentials] = useState<ILoginCredentials>({
         email: '',
         password: ''
     });
+    const [error, setError] = useState<string>('');
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setCredentials(prev => ({
             ...prev,
             [e.target.name]: e.target.value
         }));
+        // Clear error when user starts typing
+        if (error) setError('');
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const success = await login(credentials);
-        if (success) {
+        
+        // Basic validation
+        if (!credentials.email || !credentials.password) {
+            setError('Please fill in all fields');
+            return;
+        }
+
+        const result = await login(credentials);
+        if (result.success) {
             navigate('/vault');
+        } else {
+            setError(result.error || 'Invalid credentials');
         }
     };
 
@@ -37,7 +49,7 @@ const LoginForm: React.FC = () => {
                 value={credentials.email}
                 onChange={handleChange}
                 required
-                // error={error?.field === 'email' ? error.message : ''}
+                autoFocus
             />
 
             <Input
@@ -47,7 +59,7 @@ const LoginForm: React.FC = () => {
                 value={credentials.password}
                 onChange={handleChange}
                 required
-                // error={error?.field === 'password' ? error.message : ''}
+                showPasswordToggle
             />
 
             <div className="flex items-center justify-between">
@@ -64,12 +76,22 @@ const LoginForm: React.FC = () => {
                 </div>
 
                 <div className="text-sm">
-                    <a href="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
+                    <Link 
+                        to="/forgot-password" 
+                        className="font-medium text-blue-600 hover:text-blue-500"
+                    >
                         Forgot your password?
-                    </a>
+                    </Link>
                 </div>
             </div>
-            {error && <div className="error">{error}</div>}
+
+            {error && (
+                <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <span className="block sm:inline">
+                        {error}
+                    </span>
+                </div>
+            )}
 
             <Button
                 type="submit"
@@ -78,7 +100,6 @@ const LoginForm: React.FC = () => {
             >
                 {loading ? 'Signing in...' : 'Sign in'} 
             </Button>
-           
         </form>
     );
 };
