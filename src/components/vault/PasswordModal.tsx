@@ -35,14 +35,21 @@ const PasswordModal: React.FC<PasswordModalProps> = ({
     const handleSubmit = async (data: ICreatePasswordEntry) => {
         try {
             setLoading(true);
+            
+            // Validate data before submission
+            if (!data.title || !data.username || !data.password) {
+                throw new Error('Please fill in all required fields');
+            }
+            
             await addEntry(data);
             setHasChanges(false);
             onClose();
             onSuccess?.();
             toast.success('Password added successfully');
         } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to add password';
             console.error('Failed to add password:', error);
-            toast.error('Failed to add password');
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
         }

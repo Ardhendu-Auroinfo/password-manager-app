@@ -4,6 +4,7 @@ import { useVault } from '../../contexts/VaultContext';
 import { IDecryptedPasswordEntry } from '../../types/vault.types';
 import PasswordStrengthMeter from '../common/PasswordStrengthMeter';
 import { toast } from 'react-hot-toast';
+import Input from '../common/Input';
 
 interface EditPasswordModalProps {
     entry: IDecryptedPasswordEntry;
@@ -16,6 +17,7 @@ interface FormErrors {
     username?: string;
     password?: string;
     website_url?: string;
+    favorite?: boolean;
 }
 
 const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, onClose }) => {
@@ -25,7 +27,8 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
         username: entry.username,
         password: entry.password,
         website_url: entry.website_url || '',
-        notes: entry.notes || ''
+        notes: entry.notes || '',
+        favorite: entry.favorite || false
     });
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -66,10 +69,12 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
+        const { name, value, type } = e.target;
+        const newValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
+        
         setFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]: newValue
         }));
         if (errors[name as keyof FormErrors]) {
             setErrors(prev => ({
@@ -159,7 +164,7 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700">
-                                Username {formData.username}
+                                Username
                             </label>
                             <input
                                 type="text"
@@ -182,28 +187,20 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
                                 Password
                             </label>
                             <div className="mt-1 relative rounded-md shadow-sm">
-                                <input
-                                    type={showPassword ? 'text' : 'password'}
+                                
+                                <Input
                                     name="password"
+                                    type={showPassword ? "text" : "password"}
                                     value={formData.password}
                                     onChange={handleChange}
                                     autoComplete="new-password"
-                                    spellCheck="false"
                                     className={`block w-full pr-10 rounded-md focus:ring-blue-500 focus:border-blue-500 ${
                                         errors.password ? 'border-red-300' : 'border-gray-300'
-                                    }`}
+                                    }`}                                    
+                                    required
+                                    showPasswordToggle
                                 />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute inset-y-0 right-0 px-3 flex items-center"
-                                >
-                                    {showPassword ? (
-                                        <EyeSlashIcon className="h-5 w-5 text-gray-400" />
-                                    ) : (
-                                        <ClipboardIcon className="h-5 w-5 text-gray-400" />
-                                    )}
-                                </button>
+                                
                             </div>
                             {errors.password && (
                                 <p className="mt-1 text-sm text-red-600">{errors.password}</p>
@@ -228,7 +225,18 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
                             />
                         </div>
                     </div>
-
+                    <div className="flex items-center mt-2">
+                    <input
+                        type="checkbox"
+                            name="favorite"
+                            checked={formData.favorite}
+                            onChange={handleChange}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <label className="ml-2 block text-sm text-gray-900">
+                            Add to favorites
+                        </label>
+                        </div>
                     <div className="mt-6 flex justify-end space-x-3">
                         <button
                             type="button"

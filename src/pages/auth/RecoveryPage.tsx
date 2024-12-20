@@ -18,6 +18,7 @@ const RecoveryPage: React.FC = () => {
     const [message, setMessage] = useState('');
     const [step, setStep] = useState<'verify' | 'reset'>('verify');
     const [tempToken, setTempToken] = useState('');
+    const [encryptedVaultKey, setEncryptedVaultKey] = useState<string>('');
 
     useEffect(() => {
         // Get email from location state or sessionStorage
@@ -30,7 +31,14 @@ const RecoveryPage: React.FC = () => {
             return;
         }
 
-        setEmail(stateEmail || storedEmail || '');
+        const emailToUse = stateEmail || storedEmail || '';
+        setEmail(emailToUse);
+        
+        // Store email in session storage if it came from state
+        if (stateEmail && !storedEmail) {
+            sessionStorage.setItem('recovery_email', stateEmail);
+        }
+
         if (location.state?.message) {
             setMessage(location.state.message);
         }
@@ -49,6 +57,7 @@ const RecoveryPage: React.FC = () => {
             const response = await AuthService.verifyRecoveryToken(email, recoveryCode);
             if (response.success) {
                 setTempToken(response.tempToken);
+                setEncryptedVaultKey(response.encryptedVaultKey);
                 setStep('reset');
                 setMessage('Code verified successfully. Please set your new password.');
             } else {
@@ -83,15 +92,36 @@ const RecoveryPage: React.FC = () => {
             return;
         }
 
+        if (!email) {
+            setError('Email is required for password reset');
+            navigate('/forgot-password');
+            return;
+        }
+
         setLoading(true);
         setError('');
 
         try {
-            const response = await AuthService.resetPassword(tempToken, newPassword);
+            const response = await AuthService.resetPassword(
+                tempToken,
+                newPassword,
+                email,
+                encryptedVaultKey
+            );
+            
             if (response.success) {
                 sessionStorage.removeItem('recovery_email');
+                
+                // Store the token if provided
+                if (response.token) {
+                    // Update your auth state here (e.g., using Redux)
+                    // dispatch(setCredentials({ token: response.token }));
+                }
+
                 navigate('/login', { 
-                    state: { message: 'Password has been reset successfully' }
+                    state: { 
+                        message: 'Password has been reset successfully. Please login with your new password.' 
+                    }
                 });
             } else {
                 setError(response.message);

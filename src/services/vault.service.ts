@@ -2,6 +2,7 @@ import { store } from '../store';
 import { IPasswordEntry, IDecryptedPasswordEntry, ICreatePasswordEntry } from '../types/vault.types';
 import { encryptData, decryptData } from '../utils/encryption';
 import { config } from '../extension/config';
+import { secureStore } from '../utils/secureStore';
 
 const API_URL = config.API_URL;
 
@@ -60,9 +61,38 @@ export class VaultService {
     }
 
     static async createEntry(entry: ICreatePasswordEntry): Promise<IDecryptedPasswordEntry> {
-        const encryptedEntry = this.encryptEntry(entry);
-        const response = await this.request<IPasswordEntry>('/entries', 'POST', encryptedEntry);
-        return this.decryptEntry(response);
+        try {
+            const encryptedEntry = this.encryptEntry(entry);
+            
+            if (!encryptedEntry.encrypted_username || !encryptedEntry.encrypted_password) {
+                throw new Error('Failed to encrypt entry data');
+            }
+
+            const response = await this.request<IPasswordEntry>('/entries', 'POST', encryptedEntry);
+            
+            if (!response) {
+                throw new Error('No response from server');
+            }
+
+            return {
+                id: response.id,
+                vault_id: response.vault_id,
+                title: entry.title,
+                username: entry.username,
+                password: entry.password,
+                notes: entry.notes,
+                website_url: entry.website_url || '',
+                category: entry.category || '',
+                favorite: entry.favorite || false,
+                created_at: new Date(response.created_at),
+                updated_at: new Date(response.updated_at),
+                last_used: response.last_used ? new Date(response.last_used) : undefined,
+                password_strength: response.password_strength || 0
+            };
+        } catch (error) {
+            console.error('Create entry error:', error);
+            throw new Error(error instanceof Error ? error.message : 'Failed to create entry');
+        }
     }
 
     static async updateEntry(
@@ -89,67 +119,169 @@ export class VaultService {
     }
 
     private static getMasterKey(): string {
-        const masterKey = store.getState().auth.masterKey;
-        if (!masterKey) {
-            throw new Error('Master key not found. Please login again.');
+        try {
+            return secureStore.getVaultKey();
+        } catch (error) {
+            throw new Error('Vault key not found. Please login again.');
         }
-        return masterKey;
     }
 
-    private static encryptEntry(entry: Partial<ICreatePasswordEntry>): any {
-        const masterKey = this.getMasterKey();
+    public static encryptEntry(entry: Partial<ICreatePasswordEntry>): any {
+        const vaultKey = this.getMasterKey();
         
         try {
+            if (!entry.title || !entry.username || !entry.password) {
+                throw new Error('Missing required fields');
+            }
+
+            let encryptedUsername, encryptedPassword, encryptedNotes;
+            
+            try {
+                encryptedUsername = encryptData(entry.username, vaultKey);
+            } catch (error) {
+                console.error('Username encryption failed:', error);
+                throw new Error('Failed to encrypt username');
+            }
+
+            try {
+                encryptedPassword = encryptData(entry.password, vaultKey);
+            } catch (error) {
+                console.error('Password encryption failed:', error);
+                throw new Error('Failed to encrypt password');
+            }
+
+            if (entry.notes) {
+                try {
+                    encryptedNotes = encryptData(entry.notes, vaultKey);
+                } catch (error) {
+                    console.error('Notes encryption failed:', error);
+                    encryptedNotes = null;
+                }
+            }
+
             return {
-                ...entry,
-                username: entry.username ? encryptData(entry.username, masterKey) : undefined,
-                password: entry.password ? encryptData(entry.password, masterKey) : undefined,
-                notes: entry.notes ? encryptData(entry.notes, masterKey) : undefined,
+                title: entry.title,
+                encrypted_username: encryptedUsername,
+                encrypted_password: encryptedPassword,
+                encrypted_notes: encryptedNotes,
+                website_url: entry.website_url || '',
+                category: entry.category || '',
+                favorite: entry.favorite || false
             };
         } catch (error) {
             console.error('Encryption error:', error);
-            throw new Error('Failed to encrypt password entry. Please ensure you are logged in.');
+            throw new Error('Failed to encrypt password entry');
         }
     }
 
-    private static decryptEntry(entry: IPasswordEntry): IDecryptedPasswordEntry {
-        const masterKey = this.getMasterKey();
+    public static decryptEntry(entry: IPasswordEntry): IDecryptedPasswordEntry {
+        const vaultKey = this.getMasterKey();
         
         try {
-            // Convert the data array to a Uint8Array
-            const usernameArray = new Uint8Array(entry.encrypted_username.data);
-            const passwordArray = new Uint8Array(entry.encrypted_password.data);
-            const notesArray = entry.encrypted_notes ? new Uint8Array(entry.encrypted_notes.data) : null;
+            // Helper function to safely decrypt buffer data
+            const decryptBufferData = (encryptedBuffer: any): string => {
+                if (!encryptedBuffer) return '';
+                
+                try {
+                    // Handle buffer data from server
+                    if (encryptedBuffer.data && Array.isArray(encryptedBuffer.data)) {
+                        // Convert array back to encrypted string
+                        const uint8Array = new Uint8Array(encryptedBuffer.data);
+                        const encryptedString = new TextDecoder().decode(uint8Array);
+                        
+                        // Decrypt the data
+                        return decryptData(encryptedString, vaultKey);
+                    }
+                    
+                    // If it's already a string
+                    if (typeof encryptedBuffer === 'string') {
+                        return decryptData(encryptedBuffer, vaultKey);
+                    }
 
-            // Use TextDecoder to convert Uint8Array to string
-            const textDecoder = new TextDecoder();
-            const username = textDecoder.decode(usernameArray);
-            const password = textDecoder.decode(passwordArray);
-            const notes = notesArray ? textDecoder.decode(notesArray) : null;
-
-            return {
-                id: entry.id,
-                vault_id: entry.vault_id,
-                title: entry.title,
-                username: decryptData(username, masterKey),
-                password: decryptData(password, masterKey),
-                notes: notes ? decryptData(notes, masterKey) : undefined,
-                website_url: entry.website_url || '',
-                category: entry.category || '',
-                favorite: entry.favorite,
-                last_used: entry.last_used ? new Date(entry.last_used) : undefined,
-                password_strength: entry.password_strength || 0,
-                created_at: new Date(entry.created_at),
-                updated_at: new Date(entry.updated_at)
+                    return '';
+                } catch (error) {
+                    console.error('Error decrypting buffer:', error, {
+                        bufferType: typeof encryptedBuffer,
+                        hasData: !!encryptedBuffer?.data
+                    });
+                    return ''; // Return empty string instead of throwing
+                }
             };
+
+            // Decode encrypted data with error handling for each field
+            try {
+                const decryptedData = {
+                    id: entry.id,
+                    vault_id: entry.vault_id,
+                    title: entry.title,
+                    username: decryptBufferData(entry.encrypted_username),
+                    password: decryptBufferData(entry.encrypted_password),
+                    notes: entry.encrypted_notes ? 
+                        decryptBufferData(entry.encrypted_notes) : undefined,
+                    website_url: entry.website_url || '',
+                    category: entry.category || '',
+                    favorite: entry.favorite,
+                    last_used: entry.last_used ? new Date(entry.last_used) : undefined,
+                    password_strength: entry.password_strength || 0,
+                    created_at: new Date(entry.created_at),
+                    updated_at: new Date(entry.updated_at)
+                };
+
+                // Validate decrypted data
+                if (!decryptedData.username || !decryptedData.password) {
+                    throw new Error('Failed to decrypt critical fields');
+                }
+
+                return decryptedData;
+            } catch (error) {
+                console.error('Error processing entry:', error);
+                // Return a partially decrypted entry instead of throwing
+                return {
+                    id: entry.id,
+                    vault_id: entry.vault_id,
+                    title: entry.title,
+                    username: '(Decryption failed)',
+                    password: '(Decryption failed)',
+                    notes: undefined,
+                    website_url: entry.website_url || '',
+                    category: entry.category || '',
+                    favorite: entry.favorite,
+                    last_used: entry.last_used ? new Date(entry.last_used) : undefined,
+                    password_strength: entry.password_strength || 0,
+                    created_at: new Date(entry.created_at),
+                    updated_at: new Date(entry.updated_at)
+                };
+            }
         } catch (error) {
             console.error('Decryption error:', error);
-            throw new Error('Failed to decrypt password entry. Please ensure you are logged in.');
+            throw new Error('Failed to decrypt password entry');
         }
     }
 
     private static decryptEntries(entries: IPasswordEntry[]): IDecryptedPasswordEntry[] {
-        return entries.map(entry => this.decryptEntry(entry));
+        return entries.map(entry => {
+            try {
+                return this.decryptEntry(entry);
+            } catch (error) {
+                console.error(`Failed to decrypt entry ${entry.id}:`, error);
+                // Return a placeholder for failed entries
+                return {
+                    id: entry.id,
+                    vault_id: entry.vault_id,
+                    title: entry.title,
+                    username: '(Decryption failed)',
+                    password: '(Decryption failed)',
+                    notes: undefined,
+                    website_url: entry.website_url || '',
+                    category: entry.category || '',
+                    favorite: entry.favorite,
+                    last_used: entry.last_used ? new Date(entry.last_used) : undefined,
+                    password_strength: entry.password_strength || 0,
+                    created_at: new Date(entry.created_at),
+                    updated_at: new Date(entry.updated_at)
+                };
+            }
+        });
     }
 }
 

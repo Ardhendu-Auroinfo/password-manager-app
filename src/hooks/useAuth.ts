@@ -2,7 +2,8 @@ import { useAppDispatch, useAppSelector } from './useRedux';
 import { AuthService } from '../services/auth.service';
 import { setCredentials, logout } from '../store/slices/authSlice';
 import { ILoginCredentials, IRegisterCredentials } from '../types/auth.types';
-import { generateMasterKey } from '../utils/encryption';
+import { deriveKeys, decryptVaultKey } from '../utils/encryption';
+import { secureStore } from '../utils/secureStore';
 import { browser } from 'webextension-polyfill-ts';
 import { getBrowserAPI } from '../utils/browser';
 import { config } from '../extension/config';
@@ -11,16 +12,24 @@ const EXTENSION_ID = config.EXTENSION_ID;
 
 export const useAuth = () => {
     const dispatch = useAppDispatch();
-    const { user, token, masterKey, loading, error, isAuthenticated } = useAppSelector(
+    const { user, token, loading, error, isAuthenticated } = useAppSelector(
         (state) => state.auth
     );
 
     const saveAuthToExtension = async (authData: any) => {
         try {
-            // Try direct extension API first
+            const safeAuthData = {
+                user: authData.user,
+                token: authData.token,
+                isAuthenticated: authData.isAuthenticated,
+                vaultKey: secureStore.getVaultKey(),
+                encryptionKey: secureStore.getEncryptionKey(),
+                symmetricKey: secureStore.getSymmetricKey()
+            };
+
             const browser = getBrowserAPI();
             if (browser) {
-                await browser.storage.local.set({ auth: authData });
+                await browser.storage.local.set({ auth: safeAuthData });
                 console.log('Auth data saved directly to extension storage');
                 return;
             }
@@ -36,7 +45,7 @@ export const useAuth = () => {
                         EXTENSION_ID,
                         { 
                             type: 'SAVE_AUTH_DATA',
-                            payload: authData 
+                            payload: safeAuthData 
                         },
                         (response) => {
                             clearTimeout(timeout);
@@ -67,42 +76,85 @@ export const useAuth = () => {
 
     const login = async (credentials: ILoginCredentials) => {
         try {
-            const response = await AuthService.login(credentials);
-            
+            // First derive the keys
+            const { authKey, encryptionKey, symmetricKey } = deriveKeys(
+                credentials.password,
+                credentials.email
+            );
+
+            console.log('Keys derived successfully:', {
+                authKeyLength: authKey.length,
+                encryptionKeyLength: encryptionKey.length,
+                symmetricKeyLength: symmetricKey.length
+            });
+
+            // Make the login request
+            const response = await AuthService.login({
+                email: credentials.email,
+                authKey: authKey
+            });
+
             if (response.success && response.data) {
-                const masterKey = generateMasterKey(
-                    credentials.password,
-                    response.data.user.email
-                );
-
-                const authData = {
-                    user: response.data.user,
-                    token: response.data.token,
-                    masterKey,
-                    isAuthenticated: true
-                };
-
-                dispatch(setCredentials(authData));
-                
                 try {
-                    await saveAuthToExtension(authData);
-                    console.log('Auth data successfully synced with extension');
-                } catch (error) {
-                    console.error('Failed to sync with extension, but login successful:', error);
+                    if (!response.data.encryptedVaultKey) {
+                        throw new Error('Server response missing encrypted vault key');
+                    }
+
+                    console.log('Received encrypted vault key:', {
+                        length: response.data.encryptedVaultKey.length,
+                        value: response.data.encryptedVaultKey.substring(0, 20) + '...' // Log first 20 chars
+                    });
+
+                    // Decrypt vault key
+                    const vaultKey = decryptVaultKey(
+                        response.data.encryptedVaultKey,
+                        encryptionKey
+                    );
+
+                    console.log('Vault key decrypted successfully:', {
+                        length: vaultKey.length
+                    });
+
+                    // Store the keys
+                    secureStore.setKeys(
+                        encryptionKey,
+                        symmetricKey,
+                        vaultKey
+                    );
+
+                    const authData = {
+                        user: response.data.user,
+                        token: response.data.token,
+                        isAuthenticated: true
+                    };
+                    console.log('Auth data:', response.data.user);
+
+                    dispatch(setCredentials(authData));
+                    try {
+                        await saveAuthToExtension(authData);
+                        console.log('Auth data successfully synced with extension');
+                    } catch (error) {
+                        console.error('Failed to sync with extension, but login successful:', error);
+                    }
+                    return { success: true };
+                } catch (decryptError) {
+                    console.error('Decryption error:', decryptError);
+                    return {
+                        success: false,
+                        error: 'Failed to decrypt vault key'
+                    };
                 }
-                
-                return { success: true };
             }
-            return { 
-                success: false, 
-                error: response.message || 'Login failed' 
+
+            return {
+                success: false,
+                error: response.message || 'Login failed'
             };
         } catch (err: any) {
-            const errorMessage = err.response?.data?.message || 'An error occurred during login';
             console.error('Login error:', err);
-            return { 
-                success: false, 
-                error: errorMessage 
+            return {
+                success: false,
+                error: err.message || 'An error occurred during login'
             };
         }
     };
@@ -126,6 +178,9 @@ export const useAuth = () => {
 
     const logoutUser = async () => {
         try {
+            // Clear sensitive data from memory
+            secureStore.clearKeys();
+            
             // Clear Redux state
             dispatch(logout());
             AuthService.logout();
@@ -189,7 +244,6 @@ export const useAuth = () => {
     return {
         user,
         token,
-        masterKey,
         isAuthenticated,
         loading,
         error,

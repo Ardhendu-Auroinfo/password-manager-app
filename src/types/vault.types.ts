@@ -6,7 +6,7 @@ export interface IVault {
 }
 
 export interface EncryptedBuffer {
-    type: string;
+    type: 'Buffer';
     data: number[];
 }
 
@@ -14,14 +14,23 @@ export interface IPasswordEntry {
     id: string;
     vault_id: string;
     title: string;
-    encrypted_username: EncryptedBuffer;
-    encrypted_password: EncryptedBuffer;
-    encrypted_notes: EncryptedBuffer | null;
-    website_url: string | null;
-    category: string | null;
+    encrypted_username: {
+        type: 'Buffer';
+        data: number[];
+    };
+    encrypted_password: {
+        type: 'Buffer';
+        data: number[];
+    };
+    encrypted_notes?: {
+        type: 'Buffer';
+        data: number[];
+    };
+    website_url?: string;
+    category?: string;
     favorite: boolean;
-    last_used: string | null;
-    password_strength: number | null;
+    last_used?: string;
+    password_strength?: number;
     created_at: string;
     updated_at: string;
 }
@@ -50,7 +59,7 @@ export interface ICreatePasswordEntry {
     notes?: string;
     website_url?: string;
     category?: string;
-    favorite?: boolean;
+    favorite?: boolean; 
 }
 
 export interface IPasswordHistory {
