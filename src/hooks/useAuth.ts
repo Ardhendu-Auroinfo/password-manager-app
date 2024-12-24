@@ -82,11 +82,6 @@ export const useAuth = () => {
                 credentials.email
             );
 
-            console.log('Keys derived successfully:', {
-                authKeyLength: authKey.length,
-                encryptionKeyLength: encryptionKey.length,
-                symmetricKeyLength: symmetricKey.length
-            });
 
             // Make the login request
             const response = await AuthService.login({
@@ -99,21 +94,15 @@ export const useAuth = () => {
                     if (!response.data.encryptedVaultKey) {
                         throw new Error('Server response missing encrypted vault key');
                     }
-
-                    console.log('Received encrypted vault key:', {
-                        length: response.data.encryptedVaultKey.length,
-                        value: response.data.encryptedVaultKey.substring(0, 20) + '...' // Log first 20 chars
-                    });
+                    console.log("key", response.data.encryptedVaultKey)
 
                     // Decrypt vault key
                     const vaultKey = decryptVaultKey(
                         response.data.encryptedVaultKey,
                         encryptionKey
                     );
-
-                    console.log('Vault key decrypted successfully:', {
-                        length: vaultKey.length
-                    });
+                    console.log('encryptionKey', encryptionKey)
+                    console.log("vaultKey", vaultKey)
 
                     // Store the keys
                     secureStore.setKeys(
@@ -179,7 +168,7 @@ export const useAuth = () => {
     const logoutUser = async () => {
         try {
             // Clear sensitive data from memory
-            secureStore.clearKeys();
+            // secureStore.clearKeys();
             
             // Clear Redux state
             dispatch(logout());

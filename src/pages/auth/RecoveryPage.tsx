@@ -5,6 +5,9 @@ import Button from '../../components/common/Button';
 import { AuthService } from '../../services/auth.service';
 import { generateStrongPassword } from '../../utils/passwordGenerator';
 import PasswordStrengthMeter from '../../components/common/PasswordStrengthMeter';
+import { logout, setCredentials } from '../../store/slices/authSlice';
+import { useAppDispatch } from '../../hooks/useRedux';
+import { secureStore } from '../../utils/secureStore';
 
 const RecoveryPage: React.FC = () => {
     const location = useLocation();
@@ -19,6 +22,7 @@ const RecoveryPage: React.FC = () => {
     const [step, setStep] = useState<'verify' | 'reset'>('verify');
     const [tempToken, setTempToken] = useState('');
     const [encryptedVaultKey, setEncryptedVaultKey] = useState<string>('');
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         // Get email from location state or sessionStorage
@@ -55,10 +59,20 @@ const RecoveryPage: React.FC = () => {
 
         try {
             const response = await AuthService.verifyRecoveryToken(email, recoveryCode);
+            console.log('Response:', response);
             if (response.success) {
+                const authData = {
+                    user: response.user,
+                    token: response.tempToken,
+                    isAuthenticated: true
+                };
+                console.log('Auth data:', response.user);
+
+                dispatch(setCredentials(authData));
                 setTempToken(response.tempToken);
                 setEncryptedVaultKey(response.encryptedVaultKey);
                 setStep('reset');
+                console.log("encryptedVaultKey",response.encryptedVaultKey)
                 setMessage('Code verified successfully. Please set your new password.');
             } else {
                 setError(response.message);
@@ -111,12 +125,9 @@ const RecoveryPage: React.FC = () => {
             
             if (response.success) {
                 sessionStorage.removeItem('recovery_email');
-                
-                // Store the token if provided
-                if (response.token) {
-                    // Update your auth state here (e.g., using Redux)
-                    // dispatch(setCredentials({ token: response.token }));
-                }
+                secureStore.clearKeys();
+                dispatch(logout());
+                AuthService.logout();
 
                 navigate('/login', { 
                     state: { 

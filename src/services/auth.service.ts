@@ -36,7 +36,6 @@ export const AuthService = {
                 credentials.password,
                 credentials.email
             );
-
             // Encrypt symmetric key with encryption key
             const encryptedVaultKey = encryptVaultKey(symmetricKey, encryptionKey);
 
@@ -108,13 +107,12 @@ export const AuthService = {
             throw new Error('Failed to encrypt password entry');
         }
     },
-    decryptEntry(entry: IPasswordEntry, vaultKey: string): IDecryptedPasswordEntry {
-        
+    async decryptEntry(entry: IPasswordEntry, vaultKey: string): Promise<IDecryptedPasswordEntry> {
         try {
             // Helper function to safely decrypt buffer data
             const decryptBufferData = (encryptedBuffer: any): string => {
                 if (!encryptedBuffer) return '';
-                
+
                 try {
                     // Handle buffer data from server
                     if (encryptedBuffer.data && Array.isArray(encryptedBuffer.data)) {
@@ -141,53 +139,52 @@ export const AuthService = {
                 }
             };
 
+            console.log("Decrypting entry:", entry.encrypted_username);
+
             // Decode encrypted data with error handling for each field
-            try {
-                const decryptedData = {
-                    id: entry.id,
-                    vault_id: entry.vault_id,
-                    title: entry.title,
-                    username: decryptBufferData(entry.encrypted_username),
-                    password: decryptBufferData(entry.encrypted_password),
-                    notes: entry.encrypted_notes ? 
-                        decryptBufferData(entry.encrypted_notes) : undefined,
-                    website_url: entry.website_url || '',
-                    category: entry.category || '',
-                    favorite: entry.favorite,
-                    last_used: entry.last_used ? new Date(entry.last_used) : undefined,
-                    password_strength: entry.password_strength || 0,
-                    created_at: new Date(entry.created_at),
-                    updated_at: new Date(entry.updated_at)
-                };
+            const decryptedData = {
+                id: entry.id,
+                vault_id: entry.vault_id,
+                title: entry.title,
+                username: decryptBufferData(entry.encrypted_username),
+                password: decryptBufferData(entry.encrypted_password),
+                notes: entry.encrypted_notes ? 
+                    decryptBufferData(entry.encrypted_notes) : undefined,
+                website_url: entry.website_url || '',
+                category: entry.category || '',
+                favorite: entry.favorite,
+                last_used: entry.last_used ? new Date(entry.last_used) : undefined,
+                password_strength: entry.password_strength || 0,
+                created_at: new Date(entry.created_at),
+                updated_at: new Date(entry.updated_at)
+            };
 
-                // Validate decrypted data
-                if (!decryptedData.username || !decryptedData.password) {
-                    throw new Error('Failed to decrypt critical fields');
-                }
+            console.log("Decrypted data:", decryptedData);
 
-                return decryptedData;
-            } catch (error) {
-                console.error('Error processing entry:', error);
-                // Return a partially decrypted entry instead of throwing
-                return {
-                    id: entry.id,
-                    vault_id: entry.vault_id,
-                    title: entry.title,
-                    username: '(Decryption failed)',
-                    password: '(Decryption failed)',
-                    notes: undefined,
-                    website_url: entry.website_url || '',
-                    category: entry.category || '',
-                    favorite: entry.favorite,
-                    last_used: entry.last_used ? new Date(entry.last_used) : undefined,
-                    password_strength: entry.password_strength || 0,
-                    created_at: new Date(entry.created_at),
-                    updated_at: new Date(entry.updated_at)
-                };
+            // Validate decrypted data
+            if (!decryptedData.username || !decryptedData.password) {
+                throw new Error('Failed to decrypt critical fields');
             }
+
+            return decryptedData;
         } catch (error) {
-            console.error('Decryption error:', error);
-            throw new Error('Failed to decrypt password entry');
+            console.error('Error processing entry:', error);
+            // Return a partially decrypted entry instead of throwing
+            return {
+                id: entry.id,
+                vault_id: entry.vault_id,
+                title: entry.title,
+                username: '(Decryption failed)',
+                password: '(Decryption failed)',
+                notes: undefined,
+                website_url: entry.website_url || '',
+                category: entry.category || '',
+                favorite: entry.favorite,
+                last_used: entry.last_used ? new Date(entry.last_used) : undefined,
+                password_strength: entry.password_strength || 0,
+                created_at: new Date(entry.created_at),
+                updated_at: new Date(entry.updated_at)
+            };
         }
     },
 
@@ -258,9 +255,6 @@ export const AuthService = {
 
     async resetPassword(tempToken: string, newPassword: string, email: string, encryptedVaultKey: string): Promise<any> {
         try {
-            // Generate new keys
-            const { authKey, encryptionKey, symmetricKey: newSymmetricKey } = deriveKeys(newPassword, email);
-
             // Get all entries using temp token
             const response = await fetch(`${API_URL}/vault/entries-for-reset`, {
                 headers: {
@@ -273,44 +267,47 @@ export const AuthService = {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Failed to fetch entries');
             }
-            // Decrypt vault key
-            console.log('Encrypted Vault Key:', encryptedVaultKey);
-
-            const vaultKey = decryptVaultKey(encryptedVaultKey, encryptionKey);
-            secureStore.setKeys(
-                encryptionKey,
-                newSymmetricKey,
-                vaultKey
-            );
-           
 
             const entries = await response.json();
 
-            // // Re-encrypt entries with new symmetric key
-            // const reEncryptedEntries = entries.map((entry: any) => {
-            //     // Convert Buffer data to string before re-encrypting
-            //     const username = Buffer.from(entry.encrypted_username.data).toString();
-            //     const password = Buffer.from(entry.encrypted_password.data).toString();
-            //     const notes = entry.encrypted_notes ? 
-            //         Buffer.from(entry.encrypted_notes.data).toString() : null;
+            // Generate new keys for the new password
+            const { authKey, encryptionKey, symmetricKey } = deriveKeys(newPassword, email);
+            const newEncryptedVaultKey = encryptVaultKey(symmetricKey, encryptionKey);
 
-            //     return {
-            //         id: entry.id,
-            //         vault_id: entry.vault_id,
-            //         encrypted_username: encryptData(username, newSymmetricKey),
-            //         encrypted_password: encryptData(password, newSymmetricKey),
-            //         encrypted_notes: notes ? encryptData(notes, newSymmetricKey) : null
-            //     };
-            // });
-            // Decrypt entries using decryptEntry method
-            console.log("entries", entries);
-        const decryptedEntries = entries.map((entry: IPasswordEntry) => {
-            return this.decryptEntry(entry, vaultKey);
-        });
+            // Decrypt the old vault key
+            const vaultKey = secureStore.getVaultKey();
 
-        // // Re-encrypt entries with new symmetric key using encryptEntry method
-            const reEncryptedEntries = decryptedEntries.map((entry: IDecryptedPasswordEntry) => {
-                return this.encryptEntry(entry, vaultKey);
+            // Re-encrypt entries with new symmetric key
+            const reEncryptedEntries = entries.map((entry: IPasswordEntry) => {
+                try {
+                    // Convert Buffer data to string
+                    const username = entry.encrypted_username.data ? 
+                        new TextDecoder().decode(new Uint8Array(entry.encrypted_username.data)) : '';
+                    const password = entry.encrypted_password.data ? 
+                        new TextDecoder().decode(new Uint8Array(entry.encrypted_password.data)) : '';
+                    const notes = entry.encrypted_notes ? 
+                        new TextDecoder().decode(new Uint8Array(entry.encrypted_notes.data)) : null;
+
+                    // Decrypt with the old vault key
+                    const decryptedUsername = decryptData(username, vaultKey);
+                    const decryptedPassword = decryptData(password, vaultKey);
+                    const decryptedNotes = notes ? decryptData(notes, vaultKey) : null;
+
+
+                    // Re-encrypt with new symmetric key
+                    return {
+                        id: entry.id,
+                        encrypted_username: encryptData(decryptedUsername, symmetricKey),
+                        encrypted_password: encryptData(decryptedPassword, symmetricKey),
+                        encrypted_notes: decryptedNotes ? 
+                            encryptData(decryptedNotes, symmetricKey) : null,
+                        vault_id: entry.vault_id
+                    };
+                } catch (error) {
+                    console.error(`Failed to process entry ${entry.id}:`, error);
+                    
+                    throw new Error(`Failed to process entry ${entry.id}`);
+                }
             });
 
             // Send reset request
@@ -322,7 +319,7 @@ export const AuthService = {
                 },
                 body: JSON.stringify({
                     authKey,
-                    encryptedVaultKey: encryptVaultKey(newSymmetricKey, encryptionKey),
+                    encryptedVaultKey: newEncryptedVaultKey,
                     reEncryptedEntries,
                     email
                 })
@@ -337,7 +334,7 @@ export const AuthService = {
             
             if (data.success) {
                 // Store the new keys
-                secureStore.setKeys(encryptionKey, newSymmetricKey, newSymmetricKey);
+                secureStore.setKeys(encryptionKey, symmetricKey, newEncryptedVaultKey);
             }
 
             return data;
@@ -345,6 +342,6 @@ export const AuthService = {
             console.error('Reset password error:', error);
             throw error;
         }
-    },
+    }
     
 };

@@ -33,9 +33,6 @@ class SecureStore {
         localStorage.setItem('symmetricKey', symmetricKey);
         localStorage.setItem('vaultKey', vaultKey);
         
-        // Debug log
-        console.log('Keys stored successfully');
-        console.log('Vault key stored:', this.vaultKey);
     }
 
     clearKeys() {

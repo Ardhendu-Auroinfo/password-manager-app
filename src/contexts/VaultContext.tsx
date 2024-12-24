@@ -30,6 +30,7 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             setLoading(true);
             setError(null);
             const fetchedEntries = await VaultService.getAllEntries();
+            console.log("Fetched entries:", fetchedEntries);
             setEntries(fetchedEntries);
         } catch (err) {
             console.error('Error fetching entries:', err);
