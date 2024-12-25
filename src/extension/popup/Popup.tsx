@@ -10,6 +10,7 @@ import LoginView from './components/LoginView';
 import PasswordEntry from './components/PasswordEntry';
 import ExtensionPasswordForm from './components/ExtensionPasswordForm';
 import './popup.css';
+import { secureStore } from '../../utils/secureStore';
 interface DropdownState {
     [key: string]: boolean;
 }
@@ -62,6 +63,13 @@ const Popup: React.FC = () => {
                 if (result.auth) {
                     console.log('Found auth data:', result.auth);
                     dispatch(setCredentials(result.auth));
+
+                    // Set the keys in SecureStore
+                    secureStore.setKeys(
+                        result.auth.encryptionKey,
+                        result.auth.symmetricKey,
+                        result.auth.vaultKey
+                    );
                 } else {
                     console.log('No auth data found in storage');
                     dispatch(setCredentials(null));

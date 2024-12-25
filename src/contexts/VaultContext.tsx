@@ -30,6 +30,7 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             setLoading(true);
             setError(null);
             const fetchedEntries = await VaultService.getAllEntries();
+            console.log("Fetched entries:", fetchedEntries);
             setEntries(fetchedEntries);
         } catch (err) {
             console.error('Error fetching entries:', err);
@@ -59,11 +60,19 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             setLoading(true);
             setError(null);
             const newEntry = await VaultService.createEntry(entry);
-            setEntries(prevEntries => [...prevEntries, newEntry]);
+            
+            // Update the entries list with the new entry
+            setEntries(prevEntries => {
+                // Remove any existing entry with the same ID (if it exists)
+                const filteredEntries = prevEntries.filter(e => e.id !== newEntry.id);
+                return [...filteredEntries, newEntry];
+            });
+            
             return newEntry;
         } catch (err) {
-            setError('Failed to add entry');
-            throw err;
+            const errorMessage = err instanceof Error ? err.message : 'Failed to add entry';
+            setError(errorMessage);
+            throw new Error(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -73,7 +82,14 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         try {
             setLoading(true);
             setError(null);
-            await VaultService.updateEntry(id, entry);
+
+            // Ensure the favorite field is a boolean
+            const updatedEntry = {
+                ...entry,
+                favorite: entry.favorite === true // Ensure it's a boolean
+            };
+
+            await VaultService.updateEntry(id, updatedEntry);
             await refreshEntries();
         } catch (err) {
             setError('Failed to update entry');

@@ -20,6 +20,7 @@ export interface IAuthResponse {
     data?: {
         token: string;
         user: IUser;
+        encryptedVaultKey: string;
     };
 }
 
