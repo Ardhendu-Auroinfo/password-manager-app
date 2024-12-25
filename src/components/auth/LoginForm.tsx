@@ -7,7 +7,8 @@ import Input from '../common/Input';
 
 const LoginForm: React.FC = () => {
     const navigate = useNavigate();
-    const { login, loading } = useAuth();
+    const { login } = useAuth();
+    const [loading, setLoading] = useState(false);
     const [credentials, setCredentials] = useState<ILoginCredentials>({
         email: '',
         password: ''
@@ -25,18 +26,28 @@ const LoginForm: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
         
         // Basic validation
         if (!credentials.email || !credentials.password) {
             setError('Please fill in all fields');
+            setLoading(false);
             return;
         }
 
-        const result = await login(credentials);
-        if (result.success) {
-            navigate('/vault');
-        } else {
-            setError(result.error || 'Invalid credentials');
+        try {
+            // Login will handle the loading state internally
+            const result = await login(credentials);
+            if (result.success) {
+            setLoading(false);
+                navigate('/vault');
+            } else {
+                setLoading(false);
+                setError(result.error || 'Invalid credentials');
+            }
+        } catch (err: any) {
+            setLoading(false);
+            setError(err.message || 'Login failed');
         }
     };
 
@@ -50,6 +61,7 @@ const LoginForm: React.FC = () => {
                 onChange={handleChange}
                 required
                 autoFocus
+                disabled={loading}
             />
 
             <Input
@@ -60,6 +72,7 @@ const LoginForm: React.FC = () => {
                 onChange={handleChange}
                 required
                 showPasswordToggle
+                disabled={loading}
             />
 
             <div className="flex items-center justify-between">
@@ -69,6 +82,7 @@ const LoginForm: React.FC = () => {
                         name="remember-me"
                         type="checkbox"
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        disabled={loading}
                     />
                     <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
                         Remember me
@@ -78,7 +92,7 @@ const LoginForm: React.FC = () => {
                 <div className="text-sm">
                     <Link 
                         to="/forgot-password" 
-                        className="font-medium text-blue-600 hover:text-blue-500"
+                        className={`font-medium text-blue-600 hover:text-blue-500 ${loading ? 'pointer-events-none opacity-50' : ''}`}
                     >
                         Forgot your password?
                     </Link>
@@ -97,8 +111,9 @@ const LoginForm: React.FC = () => {
                 type="submit"
                 fullWidth
                 loading={loading}
+                disabled={loading}
             >
-                {loading ? 'Signing in...' : 'Sign in'} 
+                {loading ? 'Signing in...' : 'Sign in'}
             </Button>
         </form>
     );

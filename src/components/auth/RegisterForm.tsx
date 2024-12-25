@@ -10,13 +10,14 @@ import { generateStrongPassword } from '../../utils/passwordGenerator';
 
 const RegisterForm: React.FC = () => {
     const navigate = useNavigate();
-    const { register, loading, error } = useAuth();
+    const { register, error } = useAuth();
     const [credentials, setCredentials] = useState<IRegisterCredentials>({
         email: '',
         password: '',
         confirmPassword: '',
         masterPasswordHint: ''
     });
+    const [loading, setLoading] = useState(false);
     const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,12 +54,15 @@ const RegisterForm: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const isValid = validateForm();
-
-    if (!isValid) return;
+        
+        if (!isValid) return;
+        
+        setLoading(true);
         const success = await register(credentials);
         if (success) {
             navigate('/login');
         }
+        setLoading(false);
     };
 
     const handleGeneratePassword = () => {
@@ -138,8 +142,9 @@ const RegisterForm: React.FC = () => {
                 type="submit"
                 fullWidth
                 loading={loading}
+                disabled={loading}
             >
-                Create Account
+                {loading ? 'Creating Account...' : 'Create Account'}
             </Button>
         </form>
     );
