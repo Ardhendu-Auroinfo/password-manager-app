@@ -327,7 +327,7 @@ const Popup: React.FC = () => {
                 <div className="relative">
                     <input
                         type="text"
-                        placeholder="Search passwords..."
+                        placeholder="Search"
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
                         className="w-full px-3 py-2 pl-10 pr-4 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
