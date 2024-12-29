@@ -82,6 +82,7 @@ export const useAuth = () => {
                 credentials.email
             );
 
+            console.log("login authKey", authKey);
 
             // Make the login request
             const response = await AuthService.login({

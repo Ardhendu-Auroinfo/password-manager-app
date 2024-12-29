@@ -36,6 +36,7 @@ export const AuthService = {
                 credentials.password,
                 credentials.email
             );
+            console.log("authKey", authKey);
             // Encrypt symmetric key with encryption key
             const encryptedVaultKey = encryptVaultKey(symmetricKey, encryptionKey);
 
