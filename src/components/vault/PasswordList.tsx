@@ -6,8 +6,14 @@ import EditPasswordModal from './EditPasswordModal';
 import { VaultService } from '../../services/vault.service';
 import { toast } from 'react-hot-toast';
 
-const PasswordList: React.FC<{ entries: IDecryptedPasswordEntry[] }> = ({ entries }) => {
-    const { loading, error, deleteEntry } = useVault();
+interface PasswordListProps {
+    entries: IDecryptedPasswordEntry[];
+    loading?: boolean;
+    error?: string | null;
+}
+
+const PasswordList: React.FC<PasswordListProps> = ({ entries, loading, error }) => {
+    const { deleteEntry } = useVault();
     const [selectedEntry, setSelectedEntry] = useState<IDecryptedPasswordEntry | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -37,7 +43,7 @@ const PasswordList: React.FC<{ entries: IDecryptedPasswordEntry[] }> = ({ entrie
             setIsEditModalOpen(true);
         } catch (err) {
             console.error('Failed to fetch entry:', err);
-            // Handle error (e.g., show notification)
+            toast.error('Failed to fetch entry');
         }
     };
 
