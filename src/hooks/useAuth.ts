@@ -156,10 +156,10 @@ export const useAuth = () => {
             const response = await AuthService.register(credentials);
             
             if (response.success) {
-                return await login({
-                    email: credentials.email,
-                    password: credentials.password
-                });
+                // return await login({
+                //     email: credentials.email,
+                //     password: credentials.password
+                // });
             }
             return false;
         } catch (error) {

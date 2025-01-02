@@ -7,10 +7,11 @@ import Button from '../common/Button';
 import Input from '../common/Input';
 import PasswordStrengthMeter from '../common/PasswordStrengthMeter';
 import { generateStrongPassword } from '../../utils/passwordGenerator';
+import { AuthService } from '../../services/auth.service';
 
 const RegisterForm: React.FC = () => {
     const navigate = useNavigate();
-    const { register, error } = useAuth();
+    const [error, setError] = useState<string>('');
     const [credentials, setCredentials] = useState<IRegisterCredentials>({
         email: '',
         password: '',
@@ -58,9 +59,13 @@ const RegisterForm: React.FC = () => {
         if (!isValid) return;
 
         setLoading(true);
-        const success = await register(credentials);
-        if (success) {
+        const response   = await AuthService.register(credentials);
+        console.log("response", response)
+        if (response.success) {
             navigate('/login');
+        }
+        else{
+            setError(response.message || 'Registration failed');
         }
        
         setLoading(false);
