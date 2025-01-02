@@ -14,7 +14,7 @@ const VaultHeader: React.FC = () => {
     const profileRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const { user, logout } = useAuth();
-    const { refreshEntries } = useVault();
+    const { refreshEntries, searchQuery, setSearchQuery } = useVault();
 
     useOnClickOutside(profileRef, () => setIsProfileOpen(false));
 
@@ -52,6 +52,8 @@ const VaultHeader: React.FC = () => {
                                         className="block w-full h-full pl-10 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 focus:border-transparent sm:text-sm"
                                         placeholder="Search"
                                         type="search"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
                                     />
                                 </div>
                             </div>
@@ -89,7 +91,7 @@ const VaultHeader: React.FC = () => {
                                             </p>
                                         </div>
                                         <div className="py-1">
-                                            <button
+                                            {/* <button
                                                 onClick={() => {
                                                     setIsProfileOpen(false);
                                                     navigate('/account-settings');
@@ -97,7 +99,7 @@ const VaultHeader: React.FC = () => {
                                                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                             >
                                                 Account Settings
-                                            </button>
+                                            </button> */}
                                             <button
                                                 onClick={() => {
                                                     setIsProfileOpen(false);

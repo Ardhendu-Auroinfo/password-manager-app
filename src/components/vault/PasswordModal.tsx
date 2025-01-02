@@ -45,7 +45,6 @@ const PasswordModal: React.FC<PasswordModalProps> = ({
             setHasChanges(false);
             onClose();
             onSuccess?.();
-            toast.success('Password added successfully');
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Failed to add password';
             console.error('Failed to add password:', error);

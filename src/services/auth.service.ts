@@ -1,10 +1,9 @@
 import { ILoginCredentials, IRegisterCredentials, IAuthResponse, IPasswordEntry, IDecryptedPasswordEntry, ICreatePasswordEntry } from '../types';
-import { decryptData, decryptVaultKey, deriveKeys, encryptData, encryptVaultKey } from '../utils/encryption';
+import { decryptData, decryptVaultKey, deriveKeys, encryptData, encryptKeyData, encryptVaultKey } from '../utils/encryption';
 import { secureStore } from '../utils/secureStore';
 import { VaultService } from './vault.service';
 
 const API_URL = process.env.REACT_APP_API_URL;
-console.log("API_URL", API_URL);
 
 interface ILoginRequest {
     email: string;
@@ -36,10 +35,10 @@ export const AuthService = {
                 credentials.password,
                 credentials.email
             );
-            console.log("authKey", authKey);
             // Encrypt symmetric key with encryption key
             const encryptedVaultKey = encryptVaultKey(symmetricKey, encryptionKey);
-
+            
+            const encryptedKey = encryptKeyData(encryptionKey); // Use your encryption function
             // Send only derived auth key to server, never the master password
             const response = await fetch(`${API_URL}/users/register`, {
                 method: 'POST',
@@ -48,6 +47,7 @@ export const AuthService = {
                     email: credentials.email,
                     authKey: authKey,
                     encryptedVaultKey: encryptedVaultKey,
+                    encryptedKey: encryptedKey,
                     masterPasswordHint: credentials.masterPasswordHint
                 }),
             });
@@ -275,7 +275,6 @@ export const AuthService = {
             const { authKey, encryptionKey, symmetricKey } = deriveKeys(newPassword, email);
             const newEncryptedVaultKey = encryptVaultKey(symmetricKey, encryptionKey);
 
-            // Decrypt the old vault key
             const vaultKey = secureStore.getVaultKey();
 
             // Re-encrypt entries with new symmetric key
@@ -312,6 +311,8 @@ export const AuthService = {
             });
 
             // Send reset request
+            const encryptedKey = encryptKeyData(encryptionKey);
+
             const resetResponse = await fetch(`${API_URL}/users/reset-password`, {
                 method: 'POST',
                 headers: {
@@ -322,7 +323,8 @@ export const AuthService = {
                     authKey,
                     encryptedVaultKey: newEncryptedVaultKey,
                     reEncryptedEntries,
-                    email
+                    email,
+                    encryptionKey: encryptedKey
                 })
             });
 

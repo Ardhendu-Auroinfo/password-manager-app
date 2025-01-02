@@ -7,10 +7,12 @@ import Button from '../common/Button';
 import Input from '../common/Input';
 import PasswordStrengthMeter from '../common/PasswordStrengthMeter';
 import { generateStrongPassword } from '../../utils/passwordGenerator';
+import { AuthService } from '../../services/auth.service';
+import { toast } from 'react-hot-toast';
 
 const RegisterForm: React.FC = () => {
     const navigate = useNavigate();
-    const { register, error } = useAuth();
+    const [error, setError] = useState<string>('');
     const [credentials, setCredentials] = useState<IRegisterCredentials>({
         email: '',
         password: '',
@@ -54,14 +56,20 @@ const RegisterForm: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const isValid = validateForm();
-        
+
         if (!isValid) return;
-        
+
         setLoading(true);
-        const success = await register(credentials);
-        if (success) {
+        const response   = await AuthService.register(credentials);
+        console.log("response", response)
+        if (response.success) {
+            toast.success('Registration successful');
             navigate('/login');
         }
+        else{
+            setError(response.message || 'Some error occurred');
+        }
+       
         setLoading(false);
     };
 
@@ -83,7 +91,7 @@ const RegisterForm: React.FC = () => {
                 value={credentials.email}
                 onChange={handleChange}
                 required
-                // error={error?.field === 'email' ? error.message : ''}
+            // error={error?.field === 'email' ? error.message : ''}
             />
 
             <div>
@@ -106,10 +114,10 @@ const RegisterForm: React.FC = () => {
                     onChange={handleChange}
                     required
                     showPasswordToggle
-                    // error={validationErrors.password || (error?.field === 'password' ? error.message : '')}
+                // error={validationErrors.password || (error?.field === 'password' ? error.message : '')}
                 />
                 {credentials.password && (
-                    <PasswordStrengthMeter 
+                    <PasswordStrengthMeter
                         password={credentials.password}
                         email={credentials.email}
                     />
@@ -136,8 +144,13 @@ const RegisterForm: React.FC = () => {
                 value={credentials.masterPasswordHint}
                 onChange={handleChange}
             />
-            {error && <div className="error">{error}</div>}
-
+            {error && (
+                <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <span className="block sm:inline">
+                        {error}
+                    </span>
+                </div>
+            )}
             <Button
                 type="submit"
                 fullWidth

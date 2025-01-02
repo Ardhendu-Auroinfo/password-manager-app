@@ -21,7 +21,7 @@ interface FormErrors {
 }
 
 const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, onClose }) => {
-    const { updateEntry } = useVault();
+    const { updateEntry, refreshFavoriteEntries } = useVault();
     const [formData, setFormData] = useState({
         title: entry.title,
         username: entry.username,
@@ -95,6 +95,9 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
 
         try {
             await updateEntry(entry.id, formData);
+            if (entry.favorite && !formData.favorite) {
+                await refreshFavoriteEntries();
+            }
             toast.success('Password updated successfully');
             onClose();
         } catch (err) {

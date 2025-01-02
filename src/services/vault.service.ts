@@ -283,6 +283,10 @@ export class VaultService {
             }
         });
     }
+
+    static async toggleFavorite(entryId: string): Promise<void> {
+        await this.request(`/entries/${entryId}/favorite`, 'POST');
+    }
 }
 
 export const vaultService = new VaultService();

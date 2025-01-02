@@ -8,6 +8,8 @@ interface VaultContextType {
     favoriteEntries: IDecryptedPasswordEntry[];
     loading: boolean;
     error: string | null;
+    searchQuery: string;
+    setSearchQuery: (query: string) => void;
     refreshEntries: () => Promise<void>;
     refreshFavoriteEntries: () => Promise<void>;
     addEntry: (entry: ICreatePasswordEntry) => Promise<IDecryptedPasswordEntry>;
@@ -23,6 +25,7 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [favoriteEntries, setFavoriteEntries] = useState<IDecryptedPasswordEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
     const { isAuthenticated } = useAuth();
 
     const refreshEntries = async () => {
@@ -142,6 +145,8 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 favoriteEntries,
                 loading,
                 error,
+                searchQuery,
+                setSearchQuery,
                 refreshEntries,
                 refreshFavoriteEntries,
                 addEntry, 
