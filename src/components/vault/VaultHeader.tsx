@@ -91,7 +91,7 @@ const VaultHeader: React.FC = () => {
                                             </p>
                                         </div>
                                         <div className="py-1">
-                                            <button
+                                            {/* <button
                                                 onClick={() => {
                                                     setIsProfileOpen(false);
                                                     navigate('/account-settings');
@@ -99,7 +99,7 @@ const VaultHeader: React.FC = () => {
                                                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                             >
                                                 Account Settings
-                                            </button>
+                                            </button> */}
                                             <button
                                                 onClick={() => {
                                                     setIsProfileOpen(false);

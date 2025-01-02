@@ -8,6 +8,7 @@ import Input from '../common/Input';
 import PasswordStrengthMeter from '../common/PasswordStrengthMeter';
 import { generateStrongPassword } from '../../utils/passwordGenerator';
 import { AuthService } from '../../services/auth.service';
+import { toast } from 'react-hot-toast';
 
 const RegisterForm: React.FC = () => {
     const navigate = useNavigate();
@@ -62,10 +63,11 @@ const RegisterForm: React.FC = () => {
         const response   = await AuthService.register(credentials);
         console.log("response", response)
         if (response.success) {
+            toast.success('Registration successful');
             navigate('/login');
         }
         else{
-            setError(response.message || 'Registration failed');
+            setError(response.message || 'Some error occurred');
         }
        
         setLoading(false);
