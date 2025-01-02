@@ -8,6 +8,7 @@ import PasswordStrengthMeter from '../../components/common/PasswordStrengthMeter
 import { logout, setCredentials } from '../../store/slices/authSlice';
 import { useAppDispatch } from '../../hooks/useRedux';
 import { secureStore } from '../../utils/secureStore';
+import { decryptKeyData, decryptVaultKey } from '../../utils/encryption';
 
 const RecoveryPage: React.FC = () => {
     const location = useLocation();
@@ -67,12 +68,19 @@ const RecoveryPage: React.FC = () => {
                     isAuthenticated: true
                 };
                 console.log('Auth data:', response.user);
-
                 dispatch(setCredentials(authData));
                 setTempToken(response.tempToken);
                 setEncryptedVaultKey(response.encryptedVaultKey);
+                if(response.encryptedKey){
+                    const encryptionKey = decryptKeyData(response.encryptedKey)
+                    const vaultKey = decryptVaultKey(response.encryptedVaultKey, encryptionKey)
+                    
+                    secureStore.setVaultKey(vaultKey)
+                    secureStore.setEncryptionKey(encryptionKey)
+
+                }
                 setStep('reset');
-                console.log("encryptedVaultKey",response.encryptedVaultKey)
+
                 setMessage('Code verified successfully. Please set your new password.');
             } else {
                 setError(response.message);

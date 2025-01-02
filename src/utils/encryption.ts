@@ -5,6 +5,7 @@ const PBKDF2_ITERATIONS = 600000;
 const KEY_SIZE = 256;
 const SALT_SIZE = 32;
 const IV_SIZE = 12; // 96 bits for AES-GCM
+const secretKey = process.env.REACT_APP_SECRET_KEY || '';
 
 interface EncryptedData {
     ciphertext: string;
@@ -298,6 +299,28 @@ export const encryptData = (data: string, symmetricKey: string): string => {
 
 export const decryptData = (encryptedData: string, symmetricKey: string): string => {
     const decrypted = CryptoJS.AES.decrypt(encryptedData, symmetricKey, {
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
+    });
+    return decrypted.toString(CryptoJS.enc.Utf8);
+};
+
+export const encryptKeyData = (text: string): string => {
+    const iv = CryptoJS.lib.WordArray.random(16);
+    console.log("secretKey", secretKey)
+    const encrypted = CryptoJS.AES.encrypt(text, CryptoJS.enc.Utf8.parse(secretKey), {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7
+    });
+    return `${iv.toString(CryptoJS.enc.Hex)}:${encrypted.toString()}`; // Return IV with encrypted data
+};
+
+export const decryptKeyData = (text: string): string => {
+    const [ivHex, encryptedText] = text.split(':');
+    const iv = CryptoJS.enc.Hex.parse(ivHex);
+    const decrypted = CryptoJS.AES.decrypt(encryptedText, CryptoJS.enc.Utf8.parse(secretKey), {
+        iv: iv,
         mode: CryptoJS.mode.CBC,
         padding: CryptoJS.pad.Pkcs7
     });

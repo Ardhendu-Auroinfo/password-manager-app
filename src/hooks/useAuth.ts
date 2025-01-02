@@ -83,6 +83,8 @@ export const useAuth = () => {
             );
 
             console.log("login authKey", authKey);
+            console.log("symmetricKey", symmetricKey)
+            console.log("encryptionKey", encryptionKey)
 
             // Make the login request
             const response = await AuthService.login({
@@ -169,7 +171,7 @@ export const useAuth = () => {
     const logoutUser = async () => {
         try {
             // Clear sensitive data from memory
-            // secureStore.clearKeys();
+            secureStore.clearKeys();
             
             // Clear Redux state
             dispatch(logout());

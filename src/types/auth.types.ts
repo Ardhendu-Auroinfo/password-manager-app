@@ -23,7 +23,10 @@ export interface IAuthResponse {
         encryptedVaultKey: string;
     };
 }
-
+export interface IErrorResponse {
+    success: boolean;
+    error: string; // Or whatever structure your error response has
+}
 export interface IAuthError {
     message: string;
     field: string;
