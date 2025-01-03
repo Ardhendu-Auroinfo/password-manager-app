@@ -1,11 +1,12 @@
 import CryptoJS from 'crypto-js';
+import { config } from '../extension/config';
 
 // Constants for encryption
 const PBKDF2_ITERATIONS = 600000;
 const KEY_SIZE = 256;
 const SALT_SIZE = 32;
 const IV_SIZE = 12; // 96 bits for AES-GCM
-const secretKey = process.env.REACT_APP_SECRET_KEY || '';
+const secretKey = config.SECRET_KEY;
 
 interface EncryptedData {
     ciphertext: string;
