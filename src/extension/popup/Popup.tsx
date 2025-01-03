@@ -10,6 +10,7 @@ import LoginView from './components/LoginView';
 import PasswordEntry from './components/PasswordEntry';
 import ExtensionPasswordForm from './components/ExtensionPasswordForm';
 import './popup.css';
+import { config } from '../config';
 import { secureStore } from '../../utils/secureStore';
 interface DropdownState {
     [key: string]: boolean;
@@ -227,7 +228,7 @@ const Popup: React.FC = () => {
                 <div className="space-y-4">
                     <button 
                         className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center space-x-2"
-                        onClick={() => chrome.tabs.create({ url: '/login' })}
+                        onClick={() => chrome.tabs.create({ url: `${config.APP_URL}/login` })}
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
@@ -236,7 +237,7 @@ const Popup: React.FC = () => {
                     </button>
                     <button 
                         className="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center space-x-2"
-                        onClick={() => chrome.tabs.create({ url: '/register' })}
+                        onClick={() => chrome.tabs.create({ url: `${config.APP_URL}/register` })}
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
@@ -288,7 +289,7 @@ const Popup: React.FC = () => {
     //             <input
     //                 type="url"
     //                 placeholder="Website URL"
-    //                 value={formData.website_url}
+    //                 value={formData.website_url}/login
     //                 onChange={e => setFormData({ ...formData, website_url: e.target.value })}
     //                 className="w-full px-3 py-2 border rounded-md"
     //             />
@@ -421,7 +422,7 @@ const Popup: React.FC = () => {
             {/* Fixed Footer */}
             <div className="flex-shrink-0 p-4 border-t bg-white">
                 <button 
-                    onClick={() => chrome.tabs.create({ url: '/vault' })}
+                    onClick={() => chrome.tabs.create({ url: `${config.APP_URL}/vault` })}
                     className="w-full flex items-center justify-center space-x-2 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors duration-200"
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
