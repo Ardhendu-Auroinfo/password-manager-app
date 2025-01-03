@@ -8660,6 +8660,10 @@ select {
 .align-bottom {
   vertical-align: bottom;
 }
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
 .text-3xl {
   font-size: 1.875rem;
   line-height: 2.25rem;
@@ -8696,6 +8700,9 @@ select {
 }
 .font-medium {
   font-weight: 500;
+}
+.font-semibold {
+  font-weight: 600;
 }
 .uppercase {
   text-transform: uppercase;
@@ -8814,6 +8821,13 @@ select {
 .filter {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
+.transition {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
 .transition-all {
   transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -8839,6 +8853,9 @@ select {
 }
 .duration-300 {
   transition-duration: 300ms;
+}
+.ease-in-out {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body {
@@ -8908,6 +8925,12 @@ body {
   color: rgb(75 85 99 / var(--tw-text-opacity, 1));
 }
 
+.hover\\:scale-110:hover {
+  --tw-scale-x: 1.1;
+  --tw-scale-y: 1.1;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
 .hover\\:bg-blue-600:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(37 99 235 / var(--tw-bg-opacity, 1));
@@ -8961,6 +8984,11 @@ body {
 .hover\\:text-red-500:hover {
   --tw-text-opacity: 1;
   color: rgb(239 68 68 / var(--tw-text-opacity, 1));
+}
+
+.hover\\:text-yellow-500:hover {
+  --tw-text-opacity: 1;
+  color: rgb(234 179 8 / var(--tw-text-opacity, 1));
 }
 
 .hover\\:shadow-md:hover {
@@ -9123,7 +9151,7 @@ body {
     padding-left: 2rem;
     padding-right: 2rem;
   }
-}`, "",{"version":3,"sources":["webpack://./src/extension/popup/popup.css"],"names":[],"mappings":"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","sourcesContent":["@tailwind base;\n@tailwind components;\n@tailwind utilities;\n\nbody {\n    width: 320px;\n    min-height: 400px;\n    margin: 0;\n    padding: 0;\n    overflow: hidden;\n    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,\n        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;\n}\n\n#root {\n    width: 100%;\n    height: 100%;\n}\n\n.truncate {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n\n/* Add styles for dropdown menu */\n.dropdown-menu {\n    position: absolute;\n    right: 0;\n    top: 0.5rem;\n    min-width: 12rem;\n    background-color: white;\n    border-radius: 0.375rem;\n    box-shadow: 0 2px 5px rgba(0,0,0,0.1);\n    z-index: 50;\n}\n\n/* Add click outside handler */\n.dropdown-overlay {\n    position: fixed;\n    top: 0;\n    right: 0;\n    bottom: 0;\n    left: 0;\n    z-index: 40;\n}\n\n/* Custom scrollbar styles */\n::-webkit-scrollbar {\n    width: 8px;\n}\n\n::-webkit-scrollbar-track {\n    background: #f1f1f1;\n    border-radius: 4px;\n}\n\n::-webkit-scrollbar-thumb {\n    background: #888;\n    border-radius: 4px;\n}\n\n::-webkit-scrollbar-thumb:hover {\n    background: #666;\n}"],"sourceRoot":""}]);
+}`, "",{"version":3,"sources":["webpack://./src/extension/popup/popup.css"],"names":[],"mappings":"AAAA;EAAA,wBAAc;EAAd,wBAAc;EAAd,mBAAc;EAAd,mBAAc;EAAd,cAAc;EAAd,cAAc;EAAd,cAAc;EAAd,eAAc;EAAd,eAAc;EAAd,aAAc;EAAd,aAAc;EAAd,kBAAc;EAAd,sCAAc;EAAd,8BAAc;EAAd,6BAAc;EAAd,4BAAc;EAAd,eAAc;EAAd,oBAAc;EAAd,sBAAc;EAAd,uBAAc;EAAd,wBAAc;EAAd,kBAAc;EAAd,2BAAc;EAAd,4BAAc;EAAd,sCAAc;EAAd,kCAAc;EAAd,2BAAc;EAAd,sBAAc;EAAd,8BAAc;EAAd,YAAc;EAAd,kBAAc;EAAd,gBAAc;EAAd,iBAAc;EAAd,kBAAc;EAAd,cAAc;EAAd,gBAAc;EAAd,aAAc;EAAd,mBAAc;EAAd,qBAAc;EAAd,2BAAc;EAAd,yBAAc;EAAd,0BAAc;EAAd,2BAAc;EAAd,uBAAc;EAAd,wBAAc;EAAd,yBAAc;EAAd,sBAAc;EAAd,oBAAc;EAAd,sBAAc;EAAd,qBAAc;EAAd;AAAc;;AAAd;EAAA,wBAAc;EAAd,wBAAc;EAAd,mBAAc;EAAd,mBAAc;EAAd,cAAc;EAAd,cAAc;EAAd,cAAc;EAAd,eAAc;EAAd,eAAc;EAAd,aAAc;EAAd,aAAc;EAAd,kBAAc;EAAd,sCAAc;EAAd,8BAAc;EAAd,6BAAc;EAAd,4BAAc;EAAd,eAAc;EAAd,oBAAc;EAAd,sBAAc;EAAd,uBAAc;EAAd,wBAAc;EAAd,kBAAc;EAAd,2BAAc;EAAd,4BAAc;EAAd,sCAAc;EAAd,kCAAc;EAAd,2BAAc;EAAd,sBAAc;EAAd,8BAAc;EAAd,YAAc;EAAd,kBAAc;EAAd,gBAAc;EAAd,iBAAc;EAAd,kBAAc;EAAd,cAAc;EAAd,gBAAc;EAAd,aAAc;EAAd,mBAAc;EAAd,qBAAc;EAAd,2BAAc;EAAd,yBAAc;EAAd,0BAAc;EAAd,2BAAc;EAAd,uBAAc;EAAd,wBAAc;EAAd,yBAAc;EAAd,sBAAc;EAAd,oBAAc;EAAd,sBAAc;EAAd,qBAAc;EAAd;AAAc,CAAd;;CAAc,CAAd;;;CAAc;;AAAd;;;EAAA,sBAAc,EAAd,MAAc;EAAd,eAAc,EAAd,MAAc;EAAd,mBAAc,EAAd,MAAc;EAAd,qBAAc,EAAd,MAAc;AAAA;;AAAd;;EAAA,gBAAc;AAAA;;AAAd;;;;;;;;CAAc;;AAAd;;EAAA,gBAAc,EAAd,MAAc;EAAd,8BAAc,EAAd,MAAc,EAAd,MAAc;EAAd,WAAc,EAAd,MAAc;EAAd,+HAAc,EAAd,MAAc;EAAd,6BAAc,EAAd,MAAc;EAAd,+BAAc,EAAd,MAAc;EAAd,wCAAc,EAAd,MAAc;AAAA;;AAAd;;;CAAc;;AAAd;EAAA,SAAc,EAAd,MAAc;EAAd,oBAAc,EAAd,MAAc;AAAA;;AAAd;;;;CAAc;;AAAd;EAAA,SAAc,EAAd,MAAc;EAAd,cAAc,EAAd,MAAc;EAAd,qBAAc,EAAd,MAAc;AAAA;;AAAd;;CAAc;;AAAd;EAAA,yCAAc;UAAd,iCAAc;AAAA;;AAAd;;CAAc;;AAAd;;;;;;EAAA,kBAAc;EAAd,oBAAc;AAAA;;AAAd;;CAAc;;AAAd;EAAA,cAAc;EAAd,wBAAc;AAAA;;AAAd;;CAAc;;AAAd;;EAAA,mBAAc;AAAA;;AAAd;;;;;CAAc;;AAAd;;;;EAAA,+GAAc,EAAd,MAAc;EAAd,6BAAc,EAAd,MAAc;EAAd,+BAAc,EAAd,MAAc;EAAd,cAAc,EAAd,MAAc;AAAA;;AAAd;;CAAc;;AAAd;EAAA,cAAc;AAAA;;AAAd;;CAAc;;AAAd;;EAAA,cAAc;EAAd,cAAc;EAAd,kBAAc;EAAd,wBAAc;AAAA;;AAAd;EAAA,eAAc;AAAA;;AAAd;EAAA,WAAc;AAAA;;AAAd;;;;CAAc;;AAAd;EAAA,cAAc,EAAd,MAAc;EAAd,qBAAc,EAAd,MAAc;EAAd,yBAAc,EAAd,MAAc;AAAA;;AAAd;;;;CAAc;;AAAd;;;;;EAAA,oBAAc,EAAd,MAAc;EAAd,8BAAc,EAAd,MAAc;EAAd,gCAAc,EAAd,MAAc;EAAd,eAAc,EAAd,MAAc;EAAd,oBAAc,EAAd,MAAc;EAAd,oBAAc,EAAd,MAAc;EAAd,uBAAc,EAAd,MAAc;EAAd,cAAc,EAAd,MAAc;EAAd,SAAc,EAAd,MAAc;EAAd,UAAc,EAAd,MAAc;AAAA;;AAAd;;CAAc;;AAAd;;EAAA,oBAAc;AAAA;;AAAd;;;CAAc;;AAAd;;;;EAAA,0BAAc,EAAd,MAAc;EAAd,6BAAc,EAAd,MAAc;EAAd,sBAAc,EAAd,MAAc;AAAA;;AAAd;;CAAc;;AAAd;EAAA,aAAc;AAAA;;AAAd;;CAAc;;AAAd;EAAA,gBAAc;AAAA;;AAAd;;CAAc;;AAAd;EAAA,wBAAc;AAAA;;AAAd;;CAAc;;AAAd;;EAAA,YAAc;AAAA;;AAAd;;;CAAc;;AAAd;EAAA,6BAAc,EAAd,MAAc;EAAd,oBAAc,EAAd,MAAc;AAAA;;AAAd;;CAAc;;AAAd;EAAA,wBAAc;AAAA;;AAAd;;;CAAc;;AAAd;EAAA,0BAAc,EAAd,MAAc;EAAd,aAAc,EAAd,MAAc;AAAA;;AAAd;;CAAc;;AAAd;EAAA,kBAAc;AAAA;;AAAd;;CAAc;;AAAd;;;;;;;;;;;;;EAAA,SAAc;AAAA;;AAAd;EAAA,SAAc;EAAd,UAAc;AAAA;;AAAd;EAAA,UAAc;AAAA;;AAAd;;;EAAA,gBAAc;EAAd,SAAc;EAAd,UAAc;AAAA;;AAAd;;CAAc;AAAd;EAAA,UAAc;AAAA;;AAAd;;CAAc;;AAAd;EAAA,gBAAc;AAAA;;AAAd;;;CAAc;;AAAd;;EAAA,UAAc,EAAd,MAAc;EAAd,cAAc,EAAd,MAAc;AAAA;;AAAd;;CAAc;;AAAd;;EAAA,eAAc;AAAA;;AAAd;;CAAc;AAAd;EAAA,eAAc;AAAA;;AAAd;;;;CAAc;;AAAd;;;;;;;;EAAA,cAAc,EAAd,MAAc;EAAd,sBAAc,EAAd,MAAc;AAAA;;AAAd;;CAAc;;AAAd;;EAAA,eAAc;EAAd,YAAc;AAAA;;AAAd,wEAAc;AAAd;EAAA,aAAc;AAAA;;AAAd;EAAA,wBAAc;UAAd,gBAAc;EAAd,sBAAc;EAAd,qBAAc;EAAd,iBAAc;EAAd,kBAAc;EAAd,mBAAc;EAAd,sBAAc;EAAd,sBAAc;EAAd,qBAAc;EAAd,eAAc;EAAd,mBAAc;EAAd,sBAAc;AAAA;;AAAd;EAAA,8BAAc;EAAd,mBAAc;EAAd,4CAAc;EAAd,2BAAc;EAAd,4BAAc;EAAd,wBAAc;EAAd,2GAAc;EAAd,yGAAc;EAAd,iFAAc;EAAd;AAAc;;AAAd;EAAA,cAAc;EAAd;AAAc;;AAAd;EAAA;AAAc;;AAAd;EAAA,iBAAc;EAAd;AAAc;;AAAd;EAAA;AAAc;;AAAd;EAAA,cAAc;EAAd;AAAc;;AAAd;EAAA,yDAAc;EAAd,wCAAc;EAAd,4BAAc;EAAd,4BAAc;EAAd,qBAAc;EAAd,iCAAc;UAAd;AAAc;;AAAd;EAAA,yBAAc;EAAd,4BAAc;EAAd,wBAAc;EAAd,wBAAc;EAAd,sBAAc;EAAd,iCAAc;UAAd;AAAc;;AAAd;EAAA,wBAAc;UAAd,gBAAc;EAAd,UAAc;EAAd,iCAAc;UAAd,yBAAc;EAAd,qBAAc;EAAd,sBAAc;EAAd,6BAAc;EAAd,yBAAc;UAAd,iBAAc;EAAd,cAAc;EAAd,YAAc;EAAd,WAAc;EAAd,cAAc;EAAd,sBAAc;EAAd,qBAAc;EAAd,iBAAc;EAAd;AAAc;;AAAd;EAAA;AAAc;;AAAd;EAAA;AAAc;;AAAd;EAAA,8BAAc;EAAd,mBAAc;EAAd,4CAAc;EAAd,2BAAc;EAAd,4BAAc;EAAd,wBAAc;EAAd,2GAAc;EAAd,yGAAc;EAAd;AAAc;;AAAd;EAAA,yBAAc;EAAd,8BAAc;EAAd,0BAAc;EAAd,2BAAc;EAAd;AAAc;;AAAd;EAAA,yDAAc;AAAA;;AAAd;;EAAA;IAAA,wBAAc;YAAd;EAAc;AAAA;;AAAd;EAAA,yDAAc;AAAA;;AAAd;;EAAA;IAAA,wBAAc;YAAd;EAAc;AAAA;;AAAd;EAAA,yBAAc;EAAd;AAAc;;AAAd;EAAA,yDAAc;EAAd,yBAAc;EAAd,8BAAc;EAAd,0BAAc;EAAd,2BAAc;EAAd,4BAAc;AAAA;;AAAd;;EAAA;IAAA,wBAAc;YAAd;EAAc;AAAA;;AAAd;EAAA,yBAAc;EAAd;AAAc;;AAAd;EAAA,iBAAc;EAAd,qBAAc;EAAd,eAAc;EAAd,gBAAc;EAAd,UAAc;EAAd,gBAAc;EAAd;AAAc;;AAAd;EAAA,6BAAc;EAAd;AAAc;AACd;EAAA;AAAoB;AAApB;EAAA;AAAoB;AAApB;;EAAA;IAAA;EAAoB;;EAApB;IAAA;EAAoB;AAAA;AAApB;;EAAA;IAAA;EAAoB;;EAApB;IAAA;EAAoB;AAAA;AAApB;;EAAA;IAAA;EAAoB;;EAApB;IAAA;EAAoB;AAAA;AAApB;;EAAA;IAAA;EAAoB;;EAApB;IAAA;EAAoB;AAAA;AAApB;;EAAA;IAAA;EAAoB;;EAApB;IAAA;EAAoB;AAAA;AACpB;EAAA,kBAAmB;EAAnB,UAAmB;EAAnB,WAAmB;EAAnB,UAAmB;EAAnB,YAAmB;EAAnB,gBAAmB;EAAnB,sBAAmB;EAAnB,mBAAmB;EAAnB;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA,QAAmB;EAAnB;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA,iBAAmB;EAAnB;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;;EAAA;IAAA;EAAmB;AAAA;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA,wBAAmB;UAAnB;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA,uBAAmB;EAAnB,sDAAmB;EAAnB;AAAmB;AAAnB;EAAA,uBAAmB;EAAnB,uDAAmB;EAAnB;AAAmB;AAAnB;EAAA,uBAAmB;EAAnB,oDAAmB;EAAnB;AAAmB;AAAnB;EAAA,uBAAmB;EAAnB,+DAAmB;EAAnB;AAAmB;AAAnB;EAAA,uBAAmB;EAAnB,8DAAmB;EAAnB;AAAmB;AAAnB;EAAA,uBAAmB;EAAnB,+DAAmB;EAAnB;AAAmB;AAAnB;EAAA,uBAAmB;EAAnB,4DAAmB;EAAnB;AAAmB;AAAnB;EAAA,uBAAmB;EAAnB,8DAAmB;EAAnB;AAAmB;AAAnB;EAAA,uBAAmB;EAAnB,4DAAmB;EAAnB;AAAmB;AAAnB;EAAA,wBAAmB;EAAnB,kEAAmB;EAAnB;AAAmB;AAAnB;EAAA,sBAAmB;EAAnB;AAAmB;AAAnB;EAAA,sBAAmB;EAAnB;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA,gBAAmB;EAAnB,uBAAmB;EAAnB;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA,sBAAmB;EAAnB;AAAmB;AAAnB;EAAA,sBAAmB;EAAnB;AAAmB;AAAnB;EAAA,sBAAmB;EAAnB;AAAmB;AAAnB;EAAA,sBAAmB;EAAnB;AAAmB;AAAnB;EAAA,sBAAmB;EAAnB;AAAmB;AAAnB;EAAA,sBAAmB;EAAnB;AAAmB;AAAnB;EAAA,sBAAmB;EAAnB;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,qBAAmB;EAAnB;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,qBAAmB;EAAnB;AAAmB;AAAnB;EAAA,iBAAmB;EAAnB;AAAmB;AAAnB;EAAA,mBAAmB;EAAnB;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,iBAAmB;EAAnB;AAAmB;AAAnB;EAAA,mBAAmB;EAAnB;AAAmB;AAAnB;EAAA,iBAAmB;EAAnB;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA,iBAAmB;EAAnB;AAAmB;AAAnB;EAAA,mBAAmB;EAAnB;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA,eAAmB;EAAnB;AAAmB;AAAnB;EAAA,mBAAmB;EAAnB;AAAmB;AAAnB;EAAA,mBAAmB;EAAnB;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA,kBAAmB;EAAnB;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA,2BAAmB;EAAnB;AAAmB;AAAnB;EAAA,2BAAmB;EAAnB;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA,0EAAmB;EAAnB,8FAAmB;EAAnB;AAAmB;AAAnB;EAAA,+EAAmB;EAAnB,mGAAmB;EAAnB;AAAmB;AAAnB;EAAA,0CAAmB;EAAnB,uDAAmB;EAAnB;AAAmB;AAAnB;EAAA,gFAAmB;EAAnB,oGAAmB;EAAnB;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA,2GAAmB;EAAnB,yGAAmB;EAAnB;AAAmB;AAAnB;EAAA,oBAAmB;EAAnB;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA,gKAAmB;EAAnB,wJAAmB;EAAnB,iLAAmB;EAAnB,wDAAmB;EAAnB;AAAmB;AAAnB;EAAA,wBAAmB;EAAnB,wDAAmB;EAAnB;AAAmB;AAAnB;EAAA,+FAAmB;EAAnB,wDAAmB;EAAnB;AAAmB;AAAnB;EAAA,4BAAmB;EAAnB,wDAAmB;EAAnB;AAAmB;AAAnB;EAAA,+BAAmB;EAAnB,wDAAmB;EAAnB;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;AAAnB;EAAA;AAAmB;;AAEnB;IACI,YAAY;IACZ,iBAAiB;IACjB,SAAS;IACT,UAAU;IACV,gBAAgB;IAChB;oEACgE;AACpE;;AAEA;IACI,WAAW;IACX,YAAY;AAChB;;AAEA;IACI,gBAAgB;IAChB,uBAAuB;IACvB,mBAAmB;AACvB;;AAEA,iCAAiC;AACjC;IACI,kBAAkB;IAClB,QAAQ;IACR,WAAW;IACX,gBAAgB;IAChB,uBAAuB;IACvB,uBAAuB;IACvB,qCAAqC;IACrC,WAAW;AACf;;AAEA,8BAA8B;AAC9B;IACI,eAAe;IACf,MAAM;IACN,QAAQ;IACR,SAAS;IACT,OAAO;IACP,WAAW;AACf;;AAEA,4BAA4B;AAC5B;IACI,UAAU;AACd;;AAEA;IACI,mBAAmB;IACnB,kBAAkB;AACtB;;AAEA;IACI,gBAAgB;IAChB,kBAAkB;AACtB;;AAEA;IACI,gBAAgB;AACpB;;AAhEA;EAAA,oBAgEC;EAhED;AAgEC;;AAhED;EAAA,iBAgEC;EAhED,iBAgEC;EAhED;AAgEC;;AAhED;EAAA,kBAgEC;EAhED;AAgEC;;AAhED;EAAA,kBAgEC;EAhED;AAgEC;;AAhED;EAAA,kBAgEC;EAhED;AAgEC;;AAhED;EAAA,kBAgEC;EAhED;AAgEC;;AAhED;EAAA,kBAgEC;EAhED;AAgEC;;AAhED;EAAA,kBAgEC;EAhED;AAgEC;;AAhED;EAAA,kBAgEC;EAhED;AAgEC;;AAhED;EAAA,oBAgEC;EAhED;AAgEC;;AAhED;EAAA,oBAgEC;EAhED;AAgEC;;AAhED;EAAA,oBAgEC;EAhED;AAgEC;;AAhED;EAAA,oBAgEC;EAhED;AAgEC;;AAhED;EAAA,oBAgEC;EAhED;AAgEC;;AAhED;EAAA,6EAgEC;EAhED,iGAgEC;EAhED;AAgEC;;AAhED;EAAA,sBAgEC;EAhED;AAgEC;;AAhED;EAAA;AAgEC;;AAhED;EAAA,8BAgEC;EAhED;AAgEC;;AAhED;EAAA,2GAgEC;EAhED,yGAgEC;EAhED;AAgEC;;AAhED;EAAA,2GAgEC;EAhED,yGAgEC;EAhED;AAgEC;;AAhED;EAAA,oBAgEC;EAhED;AAgEC;;AAhED;EAAA,oBAgEC;EAhED;AAgEC;;AAhED;EAAA;AAgEC;;AAhED;EAAA;AAgEC;;AAhED;;EAAA;IAAA,iBAgEC;IAhED;EAgEC;;EAhED;IAAA,gBAgEC;IAhED;EAgEC;;EAhED;IAAA;EAgEC;;EAhED;IAAA;EAgEC;;EAhED;IAAA;EAgEC;;EAhED;IAAA;EAgEC;;EAhED;IAAA;EAgEC;;EAhED;IAAA;EAgEC;;EAhED;IAAA;EAgEC;;EAhED;IAAA;EAgEC;;EAhED;IAAA;EAgEC;;EAhED;IAAA;EAgEC;;EAhED;IAAA;EAgEC;;EAhED;IAAA;EAgEC;;EAhED;IAAA;EAgEC;;EAhED;IAAA,oBAgEC;IAhED;EAgEC;;EAhED;IAAA,oBAgEC;IAhED;EAgEC;;EAhED;IAAA;EAgEC;;EAhED;IAAA,mBAgEC;IAhED;EAgEC;AAAA;;AAhED;;EAAA;IAAA;EAgEC;;EAhED;IAAA,kBAgEC;IAhED;EAgEC;AAAA;;AAhED;;EAAA;IAAA;EAgEC;;EAhED;IAAA;EAgEC;;EAhED;IAAA,kBAgEC;IAhED;EAgEC;AAAA","sourcesContent":["@tailwind base;\n@tailwind components;\n@tailwind utilities;\n\nbody {\n    width: 320px;\n    min-height: 400px;\n    margin: 0;\n    padding: 0;\n    overflow: hidden;\n    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,\n        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;\n}\n\n#root {\n    width: 100%;\n    height: 100%;\n}\n\n.truncate {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n\n/* Add styles for dropdown menu */\n.dropdown-menu {\n    position: absolute;\n    right: 0;\n    top: 0.5rem;\n    min-width: 12rem;\n    background-color: white;\n    border-radius: 0.375rem;\n    box-shadow: 0 2px 5px rgba(0,0,0,0.1);\n    z-index: 50;\n}\n\n/* Add click outside handler */\n.dropdown-overlay {\n    position: fixed;\n    top: 0;\n    right: 0;\n    bottom: 0;\n    left: 0;\n    z-index: 40;\n}\n\n/* Custom scrollbar styles */\n::-webkit-scrollbar {\n    width: 8px;\n}\n\n::-webkit-scrollbar-track {\n    background: #f1f1f1;\n    border-radius: 4px;\n}\n\n::-webkit-scrollbar-thumb {\n    background: #888;\n    border-radius: 4px;\n}\n\n::-webkit-scrollbar-thumb:hover {\n    background: #666;\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -45456,6 +45484,7 @@ var VaultProvider = function (_a) {
     var _c = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)([]), favoriteEntries = _c[0], setFavoriteEntries = _c[1];
     var _d = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(true), loading = _d[0], setLoading = _d[1];
     var _e = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(null), error = _e[0], setError = _e[1];
+    var _f = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(''), searchQuery = _f[0], setSearchQuery = _f[1];
     var isAuthenticated = (0,_hooks_useAuth__WEBPACK_IMPORTED_MODULE_3__.useAuth)().isAuthenticated;
     var refreshEntries = function () { return __awaiter(void 0, void 0, void 0, function () {
         var fetchedEntries, err_1;
@@ -45468,6 +45497,7 @@ var VaultProvider = function (_a) {
                     return [4 /*yield*/, _services_vault_service__WEBPACK_IMPORTED_MODULE_2__.VaultService.getAllEntries()];
                 case 1:
                     fetchedEntries = _a.sent();
+                    console.log("Fetched entries:", fetchedEntries);
                     setEntries(fetchedEntries);
                     return [3 /*break*/, 4];
                 case 2:
@@ -45629,6 +45659,8 @@ var VaultProvider = function (_a) {
             favoriteEntries: favoriteEntries,
             loading: loading,
             error: error,
+            searchQuery: searchQuery,
+            setSearchQuery: setSearchQuery,
             refreshEntries: refreshEntries,
             refreshFavoriteEntries: refreshFavoriteEntries,
             addEntry: addEntry,
@@ -45660,8 +45692,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   config: () => (/* binding */ config)
 /* harmony export */ });
 var config = {
-    API_URL: 'http://localhost:5000/api',
-    EXTENSION_ID: 'ncompdkpjkkkkhoegkamfemdghkopobi'
+    API_URL: "http://localhost:5000/api" || 0,
+    EXTENSION_ID: "ncompdkpjkkkkhoegkamfemdghkopobi" || 0,
+    SECRET_KEY: "54sGag6tcLwKkx7E9RHpyvCVMfXAQ4F2" || 0,
+    APP_URL: "http://localhost:3000" || 0
 };
 
 
@@ -45684,12 +45718,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _hooks_useAuth__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../hooks/useAuth */ "./src/hooks/useAuth.ts");
 /* harmony import */ var _contexts_VaultContext__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../contexts/VaultContext */ "./src/contexts/VaultContext.tsx");
 /* harmony import */ var _services_vault_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../services/vault.service */ "./src/services/vault.service.ts");
-/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/dist/react-redux.mjs");
 /* harmony import */ var _store_slices_authSlice__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../store/slices/authSlice */ "./src/store/slices/authSlice.ts");
 /* harmony import */ var _components_PasswordEntry__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/PasswordEntry */ "./src/extension/popup/components/PasswordEntry.tsx");
 /* harmony import */ var _components_ExtensionPasswordForm__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/ExtensionPasswordForm */ "./src/extension/popup/components/ExtensionPasswordForm.tsx");
 /* harmony import */ var _popup_css__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./popup.css */ "./src/extension/popup/popup.css");
-/* harmony import */ var _utils_secureStore__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../utils/secureStore */ "./src/utils/secureStore.ts");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../config */ "./src/extension/config.ts");
+/* harmony import */ var _utils_secureStore__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../utils/secureStore */ "./src/utils/secureStore.ts");
 var __assign = (undefined && undefined.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -45757,6 +45792,7 @@ var __spreadArray = (undefined && undefined.__spreadArray) || function (to, from
 
 
 
+
 var Popup = function () {
     var _a = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(''), currentUrl = _a[0], setCurrentUrl = _a[1];
     var _b = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false), showAddForm = _b[0], setShowAddForm = _b[1];
@@ -45766,7 +45802,7 @@ var Popup = function () {
     var _f = (0,_hooks_useAuth__WEBPACK_IMPORTED_MODULE_2__.useAuth)(), isAuthenticated = _f.isAuthenticated, user = _f.user;
     var _g = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)(false), isLoading = _g[0], setIsLoading = _g[1];
     var _h = (0,_contexts_VaultContext__WEBPACK_IMPORTED_MODULE_3__.useVault)(), entries = _h.entries, loading = _h.loading, refreshEntries = _h.refreshEntries;
-    var dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_10__.useDispatch)();
+    var dispatch = (0,react_redux__WEBPACK_IMPORTED_MODULE_11__.useDispatch)();
     // Form state for add/edit
     var _j = (0,react__WEBPACK_IMPORTED_MODULE_1__.useState)({
         title: '',
@@ -45807,7 +45843,7 @@ var Popup = function () {
                             console.log('Found auth data:', result.auth);
                             dispatch((0,_store_slices_authSlice__WEBPACK_IMPORTED_MODULE_5__.setCredentials)(result.auth));
                             // Set the keys in SecureStore
-                            _utils_secureStore__WEBPACK_IMPORTED_MODULE_9__.secureStore.setKeys(result.auth.encryptionKey, result.auth.symmetricKey, result.auth.vaultKey);
+                            _utils_secureStore__WEBPACK_IMPORTED_MODULE_10__.secureStore.setKeys(result.auth.encryptionKey, result.auth.symmetricKey, result.auth.vaultKey);
                         }
                         else {
                             console.log('No auth data found in storage');
@@ -45985,7 +46021,7 @@ var Popup = function () {
         });
     }); };
     if (!isAuthenticated) {
-        return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", __assign({ className: "w-80 h-96 bg-white p-6" }, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", __assign({ className: "flex items-center justify-center mb-6" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", __assign({ className: "bg-blue-500 p-3 rounded-full" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("svg", __assign({ className: "w-8 h-8 text-white", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" }) })) })) })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h2", __assign({ className: "text-xl font-bold text-center text-gray-800 mb-2" }, { children: "Password Manager" })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", __assign({ className: "text-gray-600 text-center mb-6" }, { children: "Securely access your passwords across the web" })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", __assign({ className: "space-y-4" }, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", __assign({ className: "w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center space-x-2", onClick: function () { return chrome.tabs.create({ url: 'http://localhost:3000/login' }); } }, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("svg", __assign({ className: "w-5 h-5", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" }) })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { children: "Login" })] })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", __assign({ className: "w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center space-x-2", onClick: function () { return chrome.tabs.create({ url: 'http://localhost:3000/register' }); } }, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("svg", __assign({ className: "w-5 h-5", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" }) })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { children: "Sign Up" })] }))] })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", __assign({ className: "text-xs text-gray-500 text-center mt-6" }, { children: "Your passwords are encrypted and secure" }))] })));
+        return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", __assign({ className: "w-80 h-96 bg-white p-6" }, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", __assign({ className: "flex items-center justify-center mb-6" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", __assign({ className: "bg-blue-500 p-3 rounded-full" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("svg", __assign({ className: "w-8 h-8 text-white", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" }) })) })) })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h2", __assign({ className: "text-xl font-bold text-center text-gray-800 mb-2" }, { children: "Password Manager" })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", __assign({ className: "text-gray-600 text-center mb-6" }, { children: "Securely access your passwords across the web" })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", __assign({ className: "space-y-4" }, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", __assign({ className: "w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center space-x-2", onClick: function () { return chrome.tabs.create({ url: "".concat(_config__WEBPACK_IMPORTED_MODULE_9__.config.APP_URL, "/login") }); } }, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("svg", __assign({ className: "w-5 h-5", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" }) })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { children: "Login" })] })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", __assign({ className: "w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center space-x-2", onClick: function () { return chrome.tabs.create({ url: "".concat(_config__WEBPACK_IMPORTED_MODULE_9__.config.APP_URL, "/register") }); } }, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("svg", __assign({ className: "w-5 h-5", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" }) })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { children: "Sign Up" })] }))] })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("p", __assign({ className: "text-xs text-gray-500 text-center mt-6" }, { children: "Your passwords are encrypted and secure" }))] })));
     }
     // Entry Form Component
     // const EntryForm = ({ isEdit = false }) => (
@@ -46024,7 +46060,7 @@ var Popup = function () {
     //             <input
     //                 type="url"
     //                 placeholder="Website URL"
-    //                 value={formData.website_url}
+    //                 value={formData.website_url}/login
     //                 onChange={e => setFormData({ ...formData, website_url: e.target.value })}
     //                 className="w-full px-3 py-2 border rounded-md"
     //             />
@@ -46054,13 +46090,13 @@ var Popup = function () {
     //         </div>
     //     </form>
     // );
-    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", __assign({ className: "w-80 h-[600px] bg-white flex flex-col" }, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", __assign({ className: "flex-shrink-0 p-4 bg-white border-b" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", __assign({ className: "relative" }, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", { type: "text", placeholder: "Search passwords...", value: searchQuery, onChange: function (e) { return setSearchQuery(e.target.value); }, className: "w-full px-3 py-2 pl-10 pr-4 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("svg", __assign({ className: "w-5 h-5 absolute left-3 top-2.5 text-gray-400", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" }) }))] })) })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", __assign({ className: "flex-1 overflow-y-auto min-h-0" }, { children: [showAddForm && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", __assign({ className: "p-4" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_components_ExtensionPasswordForm__WEBPACK_IMPORTED_MODULE_7__["default"], { onSubmit: handleAddEntry, onCancel: function () { return setShowAddForm(false); }, isLoading: isLoading }) }))), showEditForm && selectedEntry && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", __assign({ className: "p-4" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_components_ExtensionPasswordForm__WEBPACK_IMPORTED_MODULE_7__["default"], { initialData: selectedEntry, onSubmit: handleEditEntry, onCancel: function () {
+    return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", __assign({ className: "w-80 h-[600px] bg-white flex flex-col" }, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", __assign({ className: "flex-shrink-0 p-4 bg-white border-b" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", __assign({ className: "relative" }, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", { type: "text", placeholder: "Search", value: searchQuery, onChange: function (e) { return setSearchQuery(e.target.value); }, className: "w-full px-3 py-2 pl-10 pr-4 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" }), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("svg", __assign({ className: "w-5 h-5 absolute left-3 top-2.5 text-gray-400", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" }) }))] })) })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", __assign({ className: "flex-1 overflow-y-auto min-h-0" }, { children: [showAddForm && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", __assign({ className: "p-4" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_components_ExtensionPasswordForm__WEBPACK_IMPORTED_MODULE_7__["default"], { onSubmit: handleAddEntry, onCancel: function () { return setShowAddForm(false); }, isLoading: isLoading }) }))), showEditForm && selectedEntry && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", __assign({ className: "p-4" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_components_ExtensionPasswordForm__WEBPACK_IMPORTED_MODULE_7__["default"], { initialData: selectedEntry, onSubmit: handleEditEntry, onCancel: function () {
                                 setShowEditForm(false);
                                 setSelectedEntry(null);
                             }, isLoading: isLoading }) }))), !showAddForm && !showEditForm && ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", __assign({ className: "p-4" }, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", __assign({ className: "flex justify-between items-center mb-4" }, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h3", __assign({ className: "text-lg font-medium text-gray-900" }, { children: "Passwords" })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", __assign({ onClick: function () { return setShowAddForm(true); }, className: "px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" }, { children: "Add New" }))] })), loading ? ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", __assign({ className: "flex justify-center items-center h-32" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", { className: "animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" }) }))) : sortedEntries.length === 0 ? ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", __assign({ className: "text-center py-8 text-gray-500" }, { children: searchQuery ? 'No passwords found' : 'No passwords saved yet' }))) : ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", __assign({ className: "space-y-2" }, { children: sortedEntries.map(function (entry) { return ((0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_components_PasswordEntry__WEBPACK_IMPORTED_MODULE_6__["default"], { entry: entry, onEdit: function (entry) {
                                         setSelectedEntry(entry);
                                         setShowEditForm(true);
-                                    }, onDelete: handleDeleteEntry, isDropdownOpen: !!openDropdown[entry.id], onToggleDropdown: function (id) { return toggleDropdown(id); } }, entry.id)); }) })))] })))] })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", __assign({ className: "flex-shrink-0 p-4 border-t bg-white" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", __assign({ onClick: function () { return chrome.tabs.create({ url: 'http://localhost:3000/vault' }); }, className: "w-full flex items-center justify-center space-x-2 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors duration-200" }, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("svg", __assign({ className: "w-5 h-5", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" }) })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { children: "Open Vault" })] })) }))] })));
+                                    }, onDelete: handleDeleteEntry, isDropdownOpen: !!openDropdown[entry.id], onToggleDropdown: function (id) { return toggleDropdown(id); } }, entry.id)); }) })))] })))] })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", __assign({ className: "flex-shrink-0 p-4 border-t bg-white" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("button", __assign({ onClick: function () { return chrome.tabs.create({ url: "".concat(_config__WEBPACK_IMPORTED_MODULE_9__.config.APP_URL, "/vault") }); }, className: "w-full flex items-center justify-center space-x-2 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors duration-200" }, { children: [(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("svg", __assign({ className: "w-5 h-5", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" }, { children: (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" }) })), (0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", { children: "Open Vault" })] })) }))] })));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Popup);
 
@@ -46485,11 +46521,9 @@ var useAuth = function () {
                 case 0:
                     _b.trys.push([0, 9, , 10]);
                     _a = (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_3__.deriveKeys)(credentials.password, credentials.email), authKey = _a.authKey, encryptionKey = _a.encryptionKey, symmetricKey = _a.symmetricKey;
-                    console.log('Keys derived successfully:', {
-                        authKeyLength: authKey.length,
-                        encryptionKeyLength: encryptionKey.length,
-                        symmetricKeyLength: symmetricKey.length
-                    });
+                    console.log("login authKey", authKey);
+                    console.log("symmetricKey", symmetricKey);
+                    console.log("encryptionKey", encryptionKey);
                     return [4 /*yield*/, _services_auth_service__WEBPACK_IMPORTED_MODULE_1__.AuthService.login({
                             email: credentials.email,
                             authKey: authKey
@@ -46503,14 +46537,10 @@ var useAuth = function () {
                     if (!response.data.encryptedVaultKey) {
                         throw new Error('Server response missing encrypted vault key');
                     }
-                    console.log('Received encrypted vault key:', {
-                        length: response.data.encryptedVaultKey.length,
-                        value: response.data.encryptedVaultKey.substring(0, 20) + '...' // Log first 20 chars
-                    });
+                    console.log("key", response.data.encryptedVaultKey);
                     vaultKey = (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_3__.decryptVaultKey)(response.data.encryptedVaultKey, encryptionKey);
-                    console.log('Vault key decrypted successfully:', {
-                        length: vaultKey.length
-                    });
+                    console.log('encryptionKey', encryptionKey);
+                    console.log("vaultKey", vaultKey);
                     // Store the keys
                     _utils_secureStore__WEBPACK_IMPORTED_MODULE_4__.secureStore.setKeys(encryptionKey, symmetricKey, vaultKey);
                     authData = {
@@ -46560,22 +46590,22 @@ var useAuth = function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 4, , 5]);
+                    _a.trys.push([0, 2, , 3]);
                     return [4 /*yield*/, _services_auth_service__WEBPACK_IMPORTED_MODULE_1__.AuthService.register(credentials)];
                 case 1:
                     response = _a.sent();
-                    if (!response.success) return [3 /*break*/, 3];
-                    return [4 /*yield*/, login({
-                            email: credentials.email,
-                            password: credentials.password
-                        })];
-                case 2: return [2 /*return*/, _a.sent()];
-                case 3: return [2 /*return*/, false];
-                case 4:
+                    if (response.success) {
+                        // return await login({
+                        //     email: credentials.email,
+                        //     password: credentials.password
+                        // });
+                    }
+                    return [2 /*return*/, false];
+                case 2:
                     error_3 = _a.sent();
                     console.error('Registration error:', error_3);
                     return [2 /*return*/, false];
-                case 5: return [2 /*return*/];
+                case 3: return [2 /*return*/];
             }
         });
     }); };
@@ -46695,6 +46725,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   AuthService: () => (/* binding */ AuthService)
 /* harmony export */ });
 /* harmony import */ var _utils_encryption__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/encryption */ "./src/utils/encryption.ts");
+/* harmony import */ var _utils_secureStore__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/secureStore */ "./src/utils/secureStore.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -46732,8 +46763,8 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
     }
 };
 
+
 var API_URL = "http://localhost:5000/api";
-console.log("API_URL", API_URL);
 var AuthService = {
     login: function (credentials) {
         return __awaiter(this, void 0, Promise, function () {
@@ -46765,13 +46796,14 @@ var AuthService = {
     },
     register: function (credentials) {
         return __awaiter(this, void 0, Promise, function () {
-            var _a, authKey, encryptionKey, symmetricKey, encryptedVaultKey, response, data, error_2;
+            var _a, authKey, encryptionKey, symmetricKey, encryptedVaultKey, encryptedKey, response, data, error_2;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         _b.trys.push([0, 3, , 4]);
                         _a = (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_0__.deriveKeys)(credentials.password, credentials.email), authKey = _a.authKey, encryptionKey = _a.encryptionKey, symmetricKey = _a.symmetricKey;
                         encryptedVaultKey = (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_0__.encryptVaultKey)(symmetricKey, encryptionKey);
+                        encryptedKey = (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_0__.encryptKeyData)(encryptionKey);
                         return [4 /*yield*/, fetch("".concat(API_URL, "/users/register"), {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
@@ -46779,6 +46811,7 @@ var AuthService = {
                                     email: credentials.email,
                                     authKey: authKey,
                                     encryptedVaultKey: encryptedVaultKey,
+                                    encryptedKey: encryptedKey,
                                     masterPasswordHint: credentials.masterPasswordHint
                                 }),
                             })];
@@ -46798,6 +46831,128 @@ var AuthService = {
     },
     logout: function () {
         // No need to handle localStorage here
+    },
+    encryptEntry: function (entry, vaultKey) {
+        try {
+            if (!entry.title || !entry.username || !entry.password) {
+                throw new Error('Missing required fields');
+            }
+            var encryptedUsername = void 0, encryptedPassword = void 0, encryptedNotes = void 0;
+            try {
+                encryptedUsername = (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_0__.encryptData)(entry.username, vaultKey);
+            }
+            catch (error) {
+                console.error('Username encryption failed:', error);
+                throw new Error('Failed to encrypt username');
+            }
+            try {
+                encryptedPassword = (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_0__.encryptData)(entry.password, vaultKey);
+            }
+            catch (error) {
+                console.error('Password encryption failed:', error);
+                throw new Error('Failed to encrypt password');
+            }
+            if (entry.notes) {
+                try {
+                    encryptedNotes = (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_0__.encryptData)(entry.notes, vaultKey);
+                }
+                catch (error) {
+                    console.error('Notes encryption failed:', error);
+                    encryptedNotes = null;
+                }
+            }
+            return {
+                title: entry.title,
+                encrypted_username: encryptedUsername,
+                encrypted_password: encryptedPassword,
+                encrypted_notes: encryptedNotes,
+                website_url: entry.website_url || '',
+                category: entry.category || '',
+                favorite: entry.favorite || false
+            };
+        }
+        catch (error) {
+            console.error('Encryption error:', error);
+            throw new Error('Failed to encrypt password entry');
+        }
+    },
+    decryptEntry: function (entry, vaultKey) {
+        return __awaiter(this, void 0, Promise, function () {
+            var decryptBufferData, decryptedData;
+            return __generator(this, function (_a) {
+                try {
+                    decryptBufferData = function (encryptedBuffer) {
+                        if (!encryptedBuffer)
+                            return '';
+                        try {
+                            // Handle buffer data from server
+                            if (encryptedBuffer.data && Array.isArray(encryptedBuffer.data)) {
+                                // Convert array back to encrypted string
+                                var uint8Array = new Uint8Array(encryptedBuffer.data);
+                                var encryptedString = new TextDecoder().decode(uint8Array);
+                                // Decrypt the data
+                                return (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_0__.decryptData)(encryptedString, vaultKey);
+                            }
+                            // If it's already a string
+                            if (typeof encryptedBuffer === 'string') {
+                                return (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_0__.decryptData)(encryptedBuffer, vaultKey);
+                            }
+                            return '';
+                        }
+                        catch (error) {
+                            console.error('Error decrypting buffer:', error, {
+                                bufferType: typeof encryptedBuffer,
+                                hasData: !!(encryptedBuffer === null || encryptedBuffer === void 0 ? void 0 : encryptedBuffer.data)
+                            });
+                            return ''; // Return empty string instead of throwing
+                        }
+                    };
+                    console.log("Decrypting entry:", entry.encrypted_username);
+                    decryptedData = {
+                        id: entry.id,
+                        vault_id: entry.vault_id,
+                        title: entry.title,
+                        username: decryptBufferData(entry.encrypted_username),
+                        password: decryptBufferData(entry.encrypted_password),
+                        notes: entry.encrypted_notes ?
+                            decryptBufferData(entry.encrypted_notes) : undefined,
+                        website_url: entry.website_url || '',
+                        category: entry.category || '',
+                        favorite: entry.favorite,
+                        last_used: entry.last_used ? new Date(entry.last_used) : undefined,
+                        password_strength: entry.password_strength || 0,
+                        created_at: new Date(entry.created_at),
+                        updated_at: new Date(entry.updated_at)
+                    };
+                    console.log("Decrypted data:", decryptedData);
+                    // Validate decrypted data
+                    if (!decryptedData.username || !decryptedData.password) {
+                        throw new Error('Failed to decrypt critical fields');
+                    }
+                    return [2 /*return*/, decryptedData];
+                }
+                catch (error) {
+                    console.error('Error processing entry:', error);
+                    // Return a partially decrypted entry instead of throwing
+                    return [2 /*return*/, {
+                            id: entry.id,
+                            vault_id: entry.vault_id,
+                            title: entry.title,
+                            username: '(Decryption failed)',
+                            password: '(Decryption failed)',
+                            notes: undefined,
+                            website_url: entry.website_url || '',
+                            category: entry.category || '',
+                            favorite: entry.favorite,
+                            last_used: entry.last_used ? new Date(entry.last_used) : undefined,
+                            password_strength: entry.password_strength || 0,
+                            created_at: new Date(entry.created_at),
+                            updated_at: new Date(entry.updated_at)
+                        }];
+                }
+                return [2 /*return*/];
+            });
+        });
     },
     forgotPassword: function (email) {
         return __awaiter(this, void 0, Promise, function () {
@@ -46907,35 +47062,99 @@ var AuthService = {
             });
         });
     },
-    resetPassword: function (tempToken, newPassword) {
+    resetPassword: function (tempToken, newPassword, email, encryptedVaultKey) {
         return __awaiter(this, void 0, Promise, function () {
-            var response, error_7;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var response, errorData, entries, _a, authKey, encryptionKey, symmetricKey_1, newEncryptedVaultKey, vaultKey_1, reEncryptedEntries, encryptedKey, resetResponse, errorData, data, error_7;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
-                        _a.trys.push([0, 3, , 4]);
+                        _b.trys.push([0, 9, , 10]);
+                        return [4 /*yield*/, fetch("".concat(API_URL, "/vault/entries-for-reset"), {
+                                headers: {
+                                    'Authorization': "Bearer ".concat(tempToken),
+                                    'Content-Type': 'application/json'
+                                }
+                            })];
+                    case 1:
+                        response = _b.sent();
+                        if (!!response.ok) return [3 /*break*/, 3];
+                        return [4 /*yield*/, response.json()];
+                    case 2:
+                        errorData = _b.sent();
+                        throw new Error(errorData.message || 'Failed to fetch entries');
+                    case 3: return [4 /*yield*/, response.json()];
+                    case 4:
+                        entries = _b.sent();
+                        _a = (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_0__.deriveKeys)(newPassword, email), authKey = _a.authKey, encryptionKey = _a.encryptionKey, symmetricKey_1 = _a.symmetricKey;
+                        newEncryptedVaultKey = (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_0__.encryptVaultKey)(symmetricKey_1, encryptionKey);
+                        vaultKey_1 = _utils_secureStore__WEBPACK_IMPORTED_MODULE_1__.secureStore.getVaultKey();
+                        reEncryptedEntries = entries.map(function (entry) {
+                            try {
+                                // Convert Buffer data to string
+                                var username = entry.encrypted_username.data ?
+                                    new TextDecoder().decode(new Uint8Array(entry.encrypted_username.data)) : '';
+                                var password = entry.encrypted_password.data ?
+                                    new TextDecoder().decode(new Uint8Array(entry.encrypted_password.data)) : '';
+                                var notes = entry.encrypted_notes ?
+                                    new TextDecoder().decode(new Uint8Array(entry.encrypted_notes.data)) : null;
+                                // Decrypt with the old vault key
+                                var decryptedUsername = (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_0__.decryptData)(username, vaultKey_1);
+                                var decryptedPassword = (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_0__.decryptData)(password, vaultKey_1);
+                                var decryptedNotes = notes ? (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_0__.decryptData)(notes, vaultKey_1) : null;
+                                // Re-encrypt with new symmetric key
+                                return {
+                                    id: entry.id,
+                                    encrypted_username: (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_0__.encryptData)(decryptedUsername, symmetricKey_1),
+                                    encrypted_password: (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_0__.encryptData)(decryptedPassword, symmetricKey_1),
+                                    encrypted_notes: decryptedNotes ?
+                                        (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_0__.encryptData)(decryptedNotes, symmetricKey_1) : null,
+                                    vault_id: entry.vault_id
+                                };
+                            }
+                            catch (error) {
+                                console.error("Failed to process entry ".concat(entry.id, ":"), error);
+                                throw new Error("Failed to process entry ".concat(entry.id));
+                            }
+                        });
+                        encryptedKey = (0,_utils_encryption__WEBPACK_IMPORTED_MODULE_0__.encryptKeyData)(encryptionKey);
                         return [4 /*yield*/, fetch("".concat(API_URL, "/users/reset-password"), {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
+                                    'Authorization': "Bearer ".concat(tempToken)
                                 },
                                 body: JSON.stringify({
-                                    tempToken: tempToken,
-                                    newPassword: newPassword
-                                }),
+                                    authKey: authKey,
+                                    encryptedVaultKey: newEncryptedVaultKey,
+                                    reEncryptedEntries: reEncryptedEntries,
+                                    email: email,
+                                    encryptionKey: encryptedKey
+                                })
                             })];
-                    case 1:
-                        response = _a.sent();
-                        return [4 /*yield*/, response.json()];
-                    case 2: return [2 /*return*/, _a.sent()];
-                    case 3:
-                        error_7 = _a.sent();
+                    case 5:
+                        resetResponse = _b.sent();
+                        if (!!resetResponse.ok) return [3 /*break*/, 7];
+                        return [4 /*yield*/, resetResponse.json()];
+                    case 6:
+                        errorData = _b.sent();
+                        throw new Error(errorData.message || 'Password reset failed');
+                    case 7: return [4 /*yield*/, resetResponse.json()];
+                    case 8:
+                        data = _b.sent();
+                        if (data.success) {
+                            // Store the new keys
+                            _utils_secureStore__WEBPACK_IMPORTED_MODULE_1__.secureStore.setKeys(encryptionKey, symmetricKey_1, newEncryptedVaultKey);
+                        }
+                        return [2 /*return*/, data];
+                    case 9:
+                        error_7 = _b.sent();
+                        console.error('Reset password error:', error_7);
                         throw error_7;
-                    case 4: return [2 /*return*/];
+                    case 10: return [2 /*return*/];
                 }
             });
         });
-    },
+    }
 };
 
 
@@ -47324,6 +47543,18 @@ var VaultService = /** @class */ (function () {
             }
         });
     };
+    VaultService.toggleFavorite = function (entryId) {
+        return __awaiter(this, void 0, Promise, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.request("/entries/".concat(entryId, "/favorite"), 'POST')];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     return VaultService;
 }());
 
@@ -47483,10 +47714,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   decryptData: () => (/* binding */ decryptData),
 /* harmony export */   decryptDatas: () => (/* binding */ decryptDatas),
+/* harmony export */   decryptKeyData: () => (/* binding */ decryptKeyData),
 /* harmony export */   decryptVaultKey: () => (/* binding */ decryptVaultKey),
 /* harmony export */   deriveKeys: () => (/* binding */ deriveKeys),
 /* harmony export */   encryptData: () => (/* binding */ encryptData),
 /* harmony export */   encryptDatas: () => (/* binding */ encryptDatas),
+/* harmony export */   encryptKeyData: () => (/* binding */ encryptKeyData),
 /* harmony export */   encryptVaultKey: () => (/* binding */ encryptVaultKey),
 /* harmony export */   generateMasterKey: () => (/* binding */ generateMasterKey),
 /* harmony export */   generateSecurePassword: () => (/* binding */ generateSecurePassword),
@@ -47494,6 +47727,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var crypto_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! crypto-js */ "./node_modules/crypto-js/index.js");
 /* harmony import */ var crypto_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(crypto_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _extension_config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../extension/config */ "./src/extension/config.ts");
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -47531,11 +47765,13 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
     }
 };
 
+
 // Constants for encryption
 var PBKDF2_ITERATIONS = 600000;
 var KEY_SIZE = 256;
 var SALT_SIZE = 32;
 var IV_SIZE = 12; // 96 bits for AES-GCM
+var secretKey = _extension_config__WEBPACK_IMPORTED_MODULE_1__.config.SECRET_KEY;
 /**
  * Converts string to ArrayBuffer
  */
@@ -47795,6 +48031,26 @@ var decryptData = function (encryptedData, symmetricKey) {
     });
     return decrypted.toString((crypto_js__WEBPACK_IMPORTED_MODULE_0___default().enc).Utf8);
 };
+var encryptKeyData = function (text) {
+    var iv = crypto_js__WEBPACK_IMPORTED_MODULE_0___default().lib.WordArray.random(16);
+    console.log("secretKey", secretKey);
+    var encrypted = crypto_js__WEBPACK_IMPORTED_MODULE_0___default().AES.encrypt(text, crypto_js__WEBPACK_IMPORTED_MODULE_0___default().enc.Utf8.parse(secretKey), {
+        iv: iv,
+        mode: (crypto_js__WEBPACK_IMPORTED_MODULE_0___default().mode).CBC,
+        padding: (crypto_js__WEBPACK_IMPORTED_MODULE_0___default().pad).Pkcs7
+    });
+    return "".concat(iv.toString((crypto_js__WEBPACK_IMPORTED_MODULE_0___default().enc).Hex), ":").concat(encrypted.toString()); // Return IV with encrypted data
+};
+var decryptKeyData = function (text) {
+    var _a = text.split(':'), ivHex = _a[0], encryptedText = _a[1];
+    var iv = crypto_js__WEBPACK_IMPORTED_MODULE_0___default().enc.Hex.parse(ivHex);
+    var decrypted = crypto_js__WEBPACK_IMPORTED_MODULE_0___default().AES.decrypt(encryptedText, crypto_js__WEBPACK_IMPORTED_MODULE_0___default().enc.Utf8.parse(secretKey), {
+        iv: iv,
+        mode: (crypto_js__WEBPACK_IMPORTED_MODULE_0___default().mode).CBC,
+        padding: (crypto_js__WEBPACK_IMPORTED_MODULE_0___default().pad).Pkcs7
+    });
+    return decrypted.toString((crypto_js__WEBPACK_IMPORTED_MODULE_0___default().enc).Utf8);
+};
 
 
 /***/ }),
@@ -47872,9 +48128,6 @@ var SecureStore = /** @class */ (function () {
         localStorage.setItem('encryptionKey', encryptionKey);
         localStorage.setItem('symmetricKey', symmetricKey);
         localStorage.setItem('vaultKey', vaultKey);
-        // Debug log
-        console.log('Keys stored successfully');
-        console.log('Vault key stored:', this.vaultKey);
     };
     SecureStore.prototype.clearKeys = function () {
         this.encryptionKey = null;
@@ -47901,8 +48154,25 @@ var SecureStore = /** @class */ (function () {
         return this.vaultKey;
     };
     SecureStore.prototype.setVaultKey = function (vaultKey) {
+        if (!vaultKey) {
+            throw new Error('Cannot set empty vault key');
+        }
         this.vaultKey = vaultKey;
         localStorage.setItem('vaultKey', vaultKey);
+    };
+    SecureStore.prototype.setEncryptionKey = function (encryptionKey) {
+        if (!encryptionKey) {
+            throw new Error('Cannot set empty encryption key');
+        }
+        this.encryptionKey = encryptionKey;
+        localStorage.setItem('encryptionKey', encryptionKey);
+    };
+    SecureStore.prototype.setSymmetricKey = function (symmetricKey) {
+        if (!symmetricKey) {
+            throw new Error('Cannot set empty symmetric key');
+        }
+        this.symmetricKey = symmetricKey;
+        localStorage.setItem('symmetricKey', symmetricKey);
     };
     return SecureStore;
 }());
