@@ -1,6 +1,16 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
+const dotenv = require('dotenv');
+
+// Load environment variables
+const env = dotenv.config().parsed;
+
+// Reduce env variables to a format webpack can use
+const envKeys = Object.keys(env).reduce((prev, next) => {
+    prev[`process.env.${next}`] = JSON.stringify(env[next]);
+    return prev;
+}, {});
 
 module.exports = {
     mode: 'development',
@@ -54,8 +64,6 @@ module.exports = {
                 },
             ],
         }),
-        new webpack.DefinePlugin({
-            'process.env.REACT_APP_API_URL': JSON.stringify('http://localhost:5000/api')
-        })
+        new webpack.DefinePlugin(envKeys)
     ],
 };
