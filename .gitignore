@@ -24,3 +24,5 @@ yarn-error.log*
 
 # env
 .env
+.env.production
+/dist-extension
