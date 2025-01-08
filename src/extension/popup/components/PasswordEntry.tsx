@@ -33,10 +33,24 @@ const PasswordEntry: React.FC<PasswordEntryProps> = ({
     const handleCopyToClipboard = async (text: string, type: 'username' | 'password') => {
         try {
             await navigator.clipboard.writeText(text);
+            onToggleDropdown(entry.id);
             // You can add a toast notification here
         } catch (error) {
             console.error('Failed to copy to clipboard:', error);
         }
+    };
+
+    const handleFillCredentials = () => {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs[0]?.id) {
+                chrome.tabs.sendMessage(tabs[0].id, {
+                    type: 'FILL_CREDENTIALS',
+                    username: entry.username,
+                    password: entry.password
+                });
+                onToggleDropdown(entry.id);
+            }
+        });
     };
 
     return (
@@ -133,6 +147,15 @@ const PasswordEntry: React.FC<PasswordEntryProps> = ({
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                         Edit
+                                    </button>
+                                    <button
+                                        onClick={handleFillCredentials}
+                                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                                    >
+                                        <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        Fill Credentials
                                     </button>
                                     {entry.website_url && (
                                         <button

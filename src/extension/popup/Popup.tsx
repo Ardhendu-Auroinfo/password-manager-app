@@ -54,7 +54,6 @@ const Popup: React.FC = () => {
         setOpenDropdown({});
     };
 
-
     useEffect(() => {
         const initializeAuth = async () => {
             try {
@@ -116,7 +115,6 @@ const Popup: React.FC = () => {
     const sortedEntries = [...filteredEntries].sort(
         (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
     );
-
 
     // const handleAddEntry = async (e: React.FormEvent) => {
     //     e.preventDefault();
@@ -206,6 +204,19 @@ const Popup: React.FC = () => {
             }
         }
     };
+
+    useEffect(() => {
+        const handleBlur = () => {
+            window.close();
+        };
+
+        // Listen for the window losing focus
+        window.addEventListener('blur', handleBlur);
+
+        return () => {
+            window.removeEventListener('blur', handleBlur);
+        };
+    }, []);
 
     if (!isAuthenticated) {
         return (
