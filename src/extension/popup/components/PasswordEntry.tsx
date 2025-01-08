@@ -34,7 +34,6 @@ const PasswordEntry: React.FC<PasswordEntryProps> = ({
         try {
             await navigator.clipboard.writeText(text);
             // You can add a toast notification here
-            console.log(`${type} copied to clipboard`);
         } catch (error) {
             console.error('Failed to copy to clipboard:', error);
         }

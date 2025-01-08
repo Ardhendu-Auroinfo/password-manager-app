@@ -3,7 +3,6 @@ import { config } from '../extension/config';
 
 // Constants for encryption
 const PBKDF2_ITERATIONS = 600000;
-const KEY_SIZE = 256;
 const SALT_SIZE = 32;
 const IV_SIZE = 12; // 96 bits for AES-GCM
 const secretKey = config.SECRET_KEY;
@@ -162,7 +161,6 @@ export const decryptDatas = async (encryptedDataStr: string, masterKey: string):
  */
 export const generateMasterKey = async (masterPassword: string, email: string): Promise<string> => {
     const salt = generateRandomBytes(SALT_SIZE);
-    const encoder = new TextEncoder();
     const combinedInput = `${masterPassword}${email}${Array.from(salt).join('')}`;
     
     const key = await deriveKey(combinedInput, salt);
@@ -264,12 +262,6 @@ export const encryptVaultKey = (symmetricKey: string, encryptionKey: string): st
 
 export const decryptVaultKey = (encryptedKey: string, encryptionKey: string): string => {
     try {
-        // Add logging to debug the input
-        console.log('Attempting to decrypt with:', {
-            encryptedKeyLength: encryptedKey.length,
-            encryptionKeyLength: encryptionKey.length
-        });
-
         const decrypted = CryptoJS.AES.decrypt(encryptedKey, encryptionKey, {
             mode: CryptoJS.mode.CBC,
             padding: CryptoJS.pad.Pkcs7
@@ -308,7 +300,6 @@ export const decryptData = (encryptedData: string, symmetricKey: string): string
 
 export const encryptKeyData = (text: string): string => {
     const iv = CryptoJS.lib.WordArray.random(16);
-    console.log("secretKey", secretKey)
     const encrypted = CryptoJS.AES.encrypt(text, CryptoJS.enc.Utf8.parse(secretKey), {
         iv: iv,
         mode: CryptoJS.mode.CBC,

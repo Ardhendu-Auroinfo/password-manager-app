@@ -59,10 +59,8 @@ const Popup: React.FC = () => {
         const initializeAuth = async () => {
             try {
                 const result = await chrome.storage.local.get('auth');
-                console.log('Storage result:', result);
                 
                 if (result.auth) {
-                    console.log('Found auth data:', result.auth);
                     dispatch(setCredentials(result.auth));
 
                     // Set the keys in SecureStore
@@ -84,9 +82,7 @@ const Popup: React.FC = () => {
 
         // Listen for auth state changes
         const authStateListener = (message: any) => {
-            console.log('Received message in popup:', message);
             if (message.type === 'AUTH_STATE_CHANGED') {
-                console.log('Auth state changed:', message.payload);
                 dispatch(setCredentials(message.payload));
             }
         };
