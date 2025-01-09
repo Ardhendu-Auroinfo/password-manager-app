@@ -26,3 +26,5 @@ yarn-error.log*
 .env
 .env.production
 /dist-extension
+
+build-contents.zip
