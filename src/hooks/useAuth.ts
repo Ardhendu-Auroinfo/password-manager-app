@@ -4,7 +4,6 @@ import { setCredentials, logout } from '../store/slices/authSlice';
 import { ILoginCredentials, IRegisterCredentials } from '../types/auth.types';
 import { deriveKeys, decryptVaultKey } from '../utils/encryption';
 import { secureStore } from '../utils/secureStore';
-import { browser } from 'webextension-polyfill-ts';
 import { getBrowserAPI } from '../utils/browser';
 import { config } from '../extension/config';
 
@@ -82,9 +81,6 @@ export const useAuth = () => {
                 credentials.email
             );
 
-            console.log("login authKey", authKey);
-            console.log("symmetricKey", symmetricKey)
-            console.log("encryptionKey", encryptionKey)
 
             // Make the login request
             const response = await AuthService.login({
@@ -97,15 +93,12 @@ export const useAuth = () => {
                     if (!response.data.encryptedVaultKey) {
                         throw new Error('Server response missing encrypted vault key');
                     }
-                    console.log("key", response.data.encryptedVaultKey)
 
                     // Decrypt vault key
                     const vaultKey = decryptVaultKey(
                         response.data.encryptedVaultKey,
                         encryptionKey
                     );
-                    console.log('encryptionKey', encryptionKey)
-                    console.log("vaultKey", vaultKey)
 
                     // Store the keys
                     secureStore.setKeys(
@@ -119,7 +112,6 @@ export const useAuth = () => {
                         token: response.data.token,
                         isAuthenticated: true
                     };
-                    console.log('Auth data:', response.data.user);
 
                     dispatch(setCredentials(authData));
                     try {

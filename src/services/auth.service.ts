@@ -1,7 +1,6 @@
-import { ILoginCredentials, IRegisterCredentials, IAuthResponse, IPasswordEntry, IDecryptedPasswordEntry, ICreatePasswordEntry } from '../types';
-import { decryptData, decryptVaultKey, deriveKeys, encryptData, encryptKeyData, encryptVaultKey } from '../utils/encryption';
+import { IRegisterCredentials, IAuthResponse, IPasswordEntry, IDecryptedPasswordEntry, ICreatePasswordEntry } from '../types';
+import { decryptData, deriveKeys, encryptData, encryptKeyData, encryptVaultKey } from '../utils/encryption';
 import { secureStore } from '../utils/secureStore';
-import { VaultService } from './vault.service';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -140,7 +139,6 @@ export const AuthService = {
                 }
             };
 
-            console.log("Decrypting entry:", entry.encrypted_username);
 
             // Decode encrypted data with error handling for each field
             const decryptedData = {
@@ -160,7 +158,6 @@ export const AuthService = {
                 updated_at: new Date(entry.updated_at)
             };
 
-            console.log("Decrypted data:", decryptedData);
 
             // Validate decrypted data
             if (!decryptedData.username || !decryptedData.password) {

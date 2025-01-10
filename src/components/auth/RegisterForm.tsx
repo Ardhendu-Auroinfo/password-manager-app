@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IRegisterCredentials } from '../../types';
-import { useAuth } from '../../hooks/useAuth';
 import { validatePassword, validatePasswordMatch } from '../../utils/validation';
 import Button from '../common/Button';
 import Input from '../common/Input';
@@ -61,7 +60,6 @@ const RegisterForm: React.FC = () => {
 
         setLoading(true);
         const response   = await AuthService.register(credentials);
-        console.log("response", response)
         if (response.success) {
             toast.success('Registration successful');
             navigate('/login');

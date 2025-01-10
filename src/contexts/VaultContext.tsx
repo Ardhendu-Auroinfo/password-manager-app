@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { IPasswordEntry, ICreatePasswordEntry, IDecryptedPasswordEntry } from '../types/vault.types';
+import { ICreatePasswordEntry, IDecryptedPasswordEntry } from '../types/vault.types';
 import { VaultService } from '../services/vault.service';
 import { useAuth } from '../hooks/useAuth';
 
@@ -33,7 +33,6 @@ export const VaultProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             setLoading(true);
             setError(null);
             const fetchedEntries = await VaultService.getAllEntries();
-            console.log("Fetched entries:", fetchedEntries);
             setEntries(fetchedEntries);
         } catch (err) {
             console.error('Error fetching entries:', err);

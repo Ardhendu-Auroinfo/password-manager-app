@@ -60,14 +60,12 @@ const RecoveryPage: React.FC = () => {
 
         try {
             const response = await AuthService.verifyRecoveryToken(email, recoveryCode);
-            console.log('Response:', response);
             if (response.success) {
                 const authData = {
                     user: response.user,
                     token: response.tempToken,
                     isAuthenticated: true
                 };
-                console.log('Auth data:', response.user);
                 dispatch(setCredentials(authData));
                 setTempToken(response.tempToken);
                 setEncryptedVaultKey(response.encryptedVaultKey);

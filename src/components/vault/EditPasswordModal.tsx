@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { XMarkIcon, ClipboardIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon} from '@heroicons/react/24/outline';
 import { useVault } from '../../contexts/VaultContext';
 import { IDecryptedPasswordEntry } from '../../types/vault.types';
 import PasswordStrengthMeter from '../common/PasswordStrengthMeter';
