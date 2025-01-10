@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { KeyIcon, ClipboardIcon, PencilIcon, TrashIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
+import { KeyIcon, ClipboardIcon, PencilIcon, TrashIcon, ArrowTopRightOnSquareIcon, ShareIcon } from '@heroicons/react/24/outline';
 import { useVault } from '../../contexts/VaultContext';
 import { IDecryptedPasswordEntry } from '../../types/vault.types';
 import EditPasswordModal from './EditPasswordModal';
 import { VaultService } from '../../services/vault.service';
 import { toast } from 'react-hot-toast';
+import SharePasswordModal from './SharePasswordModal';
 
 interface PasswordListProps {
     entries: IDecryptedPasswordEntry[];
@@ -16,6 +17,8 @@ const PasswordList: React.FC<PasswordListProps> = ({ entries, loading, error }) 
     const { deleteEntry } = useVault();
     const [selectedEntry, setSelectedEntry] = useState<IDecryptedPasswordEntry | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+    const [shareEntry, setShareEntry] = useState<IDecryptedPasswordEntry | null>(null);
 
     const getFaviconUrl = (websiteUrl: string): string => {
         try {
@@ -64,6 +67,11 @@ const PasswordList: React.FC<PasswordListProps> = ({ entries, loading, error }) 
             console.error('Failed to launch website:', err);
             toast.error('Failed to launch website');
         }
+    };
+
+    const handleShare = (entry: IDecryptedPasswordEntry) => {
+        setShareEntry(entry);
+        setIsShareModalOpen(true);
     };
 
     if (loading) {
@@ -176,6 +184,14 @@ const PasswordList: React.FC<PasswordListProps> = ({ entries, loading, error }) 
                                     >
                                         <TrashIcon className="h-5 w-5" />
                                     </button>
+
+                                    <button
+                                        onClick={() => handleShare(entry)}
+                                        className="text-gray-400 hover:text-green-500 transform hover:scale-110 transition duration-300 ease-in-out"
+                                        title="Share password"
+                                    >
+                                        <ShareIcon className="h-5 w-5" />
+                                    </button>
                                 </div>
 
                             </div>
@@ -192,6 +208,18 @@ const PasswordList: React.FC<PasswordListProps> = ({ entries, loading, error }) 
                         setIsEditModalOpen(false);
                         setSelectedEntry(null);
                     }}
+                />
+            )}
+
+            {shareEntry && (
+                <SharePasswordModal
+                    isOpen={isShareModalOpen}
+                    onClose={() => {
+                        setIsShareModalOpen(false);
+                        setShareEntry(null);
+                    }}
+                    entryId={shareEntry.id}
+                    entryTitle={shareEntry.title}
                 />
             )}
         </>

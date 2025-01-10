@@ -50,6 +50,25 @@ const VaultSidebar: React.FC = () => {
                         }
                             Favorites
                         </Link>
+                        <Link
+                            to="/sharing-center"
+                            className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md hover:bg-gray-50 hover:text-gray-900 ${
+                                location.pathname === '/sharing-center'
+                                    ? 'bg-gray-100 text-gray-900'
+                                    : 'text-gray-600'
+                            }`}
+                        >
+                            {location.pathname === '/sharing-center' ? 
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="mr-3 h-6 w-6">
+                                    <path fillRule="evenodd" d="M15.75 4.5a3 3 0 11.825 2.066l-8.421 4.679a3.002 3.002 0 010 1.51l8.421 4.679a3 3 0 11-.729 1.31l-8.421-4.678a3 3 0 110-4.132l8.421-4.679a3 3 0 01-.096-.755z" clipRule="evenodd" />
+                                </svg>
+                                :
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="mr-3 h-6 w-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 4.5a3 3 0 11.825 2.066l-8.421 4.679a3.002 3.002 0 010 1.51l8.421 4.679a3 3 0 11-.729 1.31l-8.421-4.678a3 3 0 110-4.132l8.421-4.679a3 3 0 01-.096-.755z" />
+                                </svg>
+                            }
+                            Sharing Center
+                        </Link>
                         
                         
                         {/* <a href="#" className="group flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">

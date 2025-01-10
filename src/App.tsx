@@ -14,6 +14,7 @@ import FavoritePage from './pages/vault/FavoritePage';
 import ForgotPasswordForm from './components/auth/ForgotPasswordForm';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import RecoveryPage from './pages/auth/RecoveryPage';
+import SharingCenterPage from './pages/vault/SharingCenterPage';
 
 // Separate component for routes that uses Redux hooks
 const AppRoutes: React.FC = () => {
@@ -42,6 +43,12 @@ const AppRoutes: React.FC = () => {
                 <Route path="/favorites" element={
                     <ProtectedRoute>
                         <FavoritePage />
+                    </ProtectedRoute>
+                } />
+
+                <Route path="/sharing-center" element={
+                    <ProtectedRoute>
+                        <SharingCenterPage />
                     </ProtectedRoute>
                 } />
 
