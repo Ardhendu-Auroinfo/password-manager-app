@@ -40,11 +40,13 @@ const SharedByMeList: React.FC = () => {
         }
     };
 
-    const handleRevokeAccess = async (id: string) => {
+    const handleRevokeAccess = async (id: string, sharedWithEmail: string) => {
         try {
-            await ShareService.revokeAccess(id);
-            toast.success('Access revoked successfully');
-            loadSharedPasswords();
+            if (window.confirm(`Are you sure you want to revoke access to ${sharedWithEmail}? They'll lose access to this item`)) {
+                await ShareService.revokeAccess(id);
+                toast.success('Access revoked successfully');
+                loadSharedPasswords();
+            }
         } catch (error) {
             toast.error('Failed to revoke access');
         }
@@ -146,7 +148,7 @@ const SharedByMeList: React.FC = () => {
                                     <ClipboardIcon className="h-5 w-5" />
                                 </button>
                                 <button
-                                    onClick={() => handleRevokeAccess(shared.id)}
+                                    onClick={() => handleRevokeAccess(shared.id, shared.shared_with_email)}
                                     className="text-gray-400 hover:text-red-600"
                                     title="Revoke access"
                                 >

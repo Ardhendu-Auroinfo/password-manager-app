@@ -40,9 +40,11 @@ const SharedPasswordsList: React.FC = () => {
 
     const handleRevokeAccess = async (id: string) => {
         try {
-            await ShareService.revokeAccess(id);
-            toast.success('Access revoked successfully');
-            loadSharedPasswords();
+            if (window.confirm(`Are you sure you want to revoke access?`)) {
+                await ShareService.revokeAccess(id);
+                toast.success('Access revoked successfully');
+                loadSharedPasswords();
+            }
         } catch (error) {
             toast.error('Failed to revoke access');
         }
@@ -134,8 +136,6 @@ const SharedPasswordsList: React.FC = () => {
                                 >
                                     <ClipboardIcon className="h-5 w-5" />
                                 </button>
-
-
                                 <button
                                     onClick={() => handleRevokeAccess(shared.id)}
                                     className="text-gray-400 hover:text-red-600"
@@ -143,7 +143,6 @@ const SharedPasswordsList: React.FC = () => {
                                 >
                                     <TrashIcon className="h-5 w-5" />
                                 </button>
-                                
                             </div>
                         </div>
                     </li>
