@@ -4,6 +4,7 @@ export interface ISharedPassword {
     shared_by: string;
     shared_by_email: string;
     shared_with: string;
+    shared_with_email: string;
     permission_level: 'read' | 'write' | 'admin';
     expires_at?: Date;
     title: string;
@@ -13,6 +14,7 @@ export interface ISharedPassword {
         type: 'Buffer';
         data: number[];
     };
+    shared_key: string;
 }
 
 export interface ISharePasswordRequest {
@@ -20,4 +22,5 @@ export interface ISharePasswordRequest {
     sharedWithEmail: string;
     permissionLevel: 'read' | 'write' | 'admin';
     expiresAt?: Date;
+    sharedKey?: string;
 }

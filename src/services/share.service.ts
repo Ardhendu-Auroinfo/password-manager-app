@@ -1,6 +1,8 @@
 import { ISharedPassword, ISharePasswordRequest } from '../types/share.types';
 import { config } from '../extension/config';
 import { store } from '../store';
+import { secureStore } from '../utils/secureStore';
+import { encryptKeyData } from '../utils/encryption';
 
 const API_URL = config.API_URL;
 
@@ -14,18 +16,24 @@ export class ShareService {
     }
 
     static async sharePassword(request: ISharePasswordRequest): Promise<void> {
+
+        const vaultKey = secureStore.getVaultKey();
+        const sharedKey = encryptKeyData(vaultKey);
+
         const response = await fetch(`${API_URL}/vault/share`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${this.getToken()}`
             },
-            body: JSON.stringify(request)
+            body: JSON.stringify({
+                ...request,
+                sharedKey
+            })
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Failed to share password');
+            throw new Error('Failed to share password');
         }
     }
 
@@ -51,7 +59,7 @@ export class ShareService {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to fetch passwords shared by me');
+            throw new Error('Failed to fetch shared by me passwords');
         }
 
         return response.json();
