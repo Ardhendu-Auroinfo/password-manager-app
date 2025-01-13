@@ -42,7 +42,8 @@ const SharePasswordModal: React.FC<SharePasswordModalProps> = ({
             toast.success('Password shared successfully');
             onClose();
         } catch (error) {
-            toast.error('Failed to share password');
+            const errorMessage = error instanceof Error ? error.message : 'Failed to share password';
+            toast.error(errorMessage);
             console.error('Share error:', error);
         } finally {
             setIsLoading(false);
