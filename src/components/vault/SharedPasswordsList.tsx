@@ -151,7 +151,7 @@ const SharedPasswordsList: React.FC = () => {
                                         ? 'bg-blue-100 text-blue-800'
                                         : 'bg-gray-100 text-gray-800'
                                 }`}>
-                                    {shared.permission_level.charAt(0).toUpperCase() + shared.permission_level.slice(1)}
+                                    {shared?.permission_level?.charAt(0).toUpperCase() + shared?.permission_level?.slice(1)}
                                 </span>
                                 {shared.expires_at && (
                                     <span className="text-xs text-gray-500 mt-1">

@@ -79,4 +79,21 @@ export class ShareService {
         }
     }
 
+    static async updatePermissionLevel(shareId: string, permissionLevel: string): Promise<void> {
+        console.log('shareId', shareId);
+        console.log('permissionLevel', permissionLevel);
+        const response = await fetch(`${API_URL}/vault/share/${shareId}/permission`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.getToken()}`
+            },
+            body: JSON.stringify({ permission_level: permissionLevel })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update permission level');
+        }
+    }
+
 }

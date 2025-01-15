@@ -92,6 +92,18 @@ const SharedByMeList: React.FC = () => {
         }
     };
 
+    const handlePermissionChange = async (shareId: string, newPermission: string) => {
+        try {
+            if(window.confirm(`Are you sure you want to update the permission level to ${newPermission}?`)) {
+                await ShareService.updatePermissionLevel(shareId, newPermission);
+                toast.success('Permission updated successfully');
+                loadSharedPasswords();
+            }
+        } catch (error) {
+            console.error('Failed to update permission:', error);
+            toast.error('Failed to update permission');
+        }
+    };
 
     if (loading) {
         return <div className="flex justify-center items-center p-4">
@@ -137,14 +149,20 @@ const SharedByMeList: React.FC = () => {
 
                             <div className="flex flex-col items-center justify-center w-1/4">
                                 <p className="text-sm text-gray-500 mb-2">Access level:</p>
-                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${shared.permission_level === 'admin'
-                                        ? 'bg-yellow-100 text-yellow-800'
-                                        : shared.permission_level === 'write'
-                                            ? 'bg-blue-100 text-blue-800'
-                                            : 'bg-gray-100 text-gray-800'
-                                    }`}>
-                                    {shared.permission_level.charAt(0).toUpperCase() + shared.permission_level.slice(1)}
-                                </span>
+                                <select
+                                    value={shared.permission_level}
+                                    onChange={(e) => handlePermissionChange(shared.id, e.target.value)}
+                                    className={`px-3 py-1 cursor-pointer rounded-full text-sm font-medium border-gray-300 focus:ring-blue-500 focus:border-blue-500
+                                        ${shared.permission_level === 'admin'
+                                            ? 'bg-yellow-100 text-yellow-800'
+                                            : shared.permission_level === 'write'
+                                                ? 'bg-blue-100 text-blue-800'
+                                                : 'bg-gray-100 text-gray-800'
+                                        }`}
+                                >
+                                    <option value="read">Read</option>
+                                    <option value="write">Write</option>
+                                </select>
                                 {shared.expires_at && (
                                     <span className="text-xs text-gray-500 mt-1">
                                         Expires: {new Date(shared.expires_at).toLocaleDateString()}
