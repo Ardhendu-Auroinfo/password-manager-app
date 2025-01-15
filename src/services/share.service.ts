@@ -96,4 +96,19 @@ export class ShareService {
         }
     }
 
+    static async updateExpiry(shareId: string, expiresAt: Date | null): Promise<void> {
+        const response = await fetch(`${API_URL}/vault/share/${shareId}/expiry`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.getToken()}`
+            },
+            body: JSON.stringify({ expires_at: expiresAt })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update expiry');
+        }
+    }
+
 }

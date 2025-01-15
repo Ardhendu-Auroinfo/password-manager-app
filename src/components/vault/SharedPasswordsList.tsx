@@ -81,7 +81,7 @@ const SharedPasswordsList: React.FC = () => {
                 password_strength: shared.password_strength || 0,
                 created_at: shared.created_at,
                 updated_at: shared.updated_at,
-               
+
             };
             setSelectedEntry(entry);
             setIsEditModalOpen(true);
@@ -90,11 +90,48 @@ const SharedPasswordsList: React.FC = () => {
             toast.error('Failed to prepare entry for editing');
         }
     };
-    
+
 
     const getFaviconUrl = (websiteUrl: string) => {
         const url = new URL(websiteUrl);
         return `https://www.google.com/s2/favicons?domain=${url.hostname}`;
+    };
+
+    const getExpiryStatus = (expiryDate: Date | null | undefined) => {
+        if (!expiryDate) return null;
+        
+        const now = new Date();
+        const expiry = new Date(expiryDate);
+        
+        if (expiry <= now) {
+            return { status: 'Expired', className: 'text-red-600' };
+        }
+        
+        const diffTime = expiry.getTime() - now.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
+        
+        let timeLeft;
+        if (diffDays > 1) {
+            timeLeft = `${diffDays} days`;
+        } else if (diffHours > 1) {
+            timeLeft = `${diffHours} hours`;
+        } else {
+            timeLeft = 'Less than 1 hour';
+        }
+        
+        return { 
+            status: 'Active', 
+            timeLeft,
+            className: 'text-green-600'
+        };
+    };
+
+    const isShareExpired = (expiryDate: Date | null | undefined): boolean => {
+        if (!expiryDate) return false;
+        const now = new Date();
+        const expiry = new Date(expiryDate);
+        return expiry <= now;
     };
 
     if (loading) {
@@ -110,7 +147,7 @@ const SharedPasswordsList: React.FC = () => {
                     <li key={shared.id} className="px-4 py-4">
                         <div className="px-4 py-4 flex items-center justify-between sm:px-6 hover:bg-gray-50">
                             {/* First Column - Icon, Title, URL */}
-                            <div className="flex items-center min-w-0 w-2/4">
+                            <div className="flex items-center min-w-0 w-2/5">
                                 <div className="flex-shrink-0">
                                     {shared.website_url && (
                                         <div className="flex-shrink-0 w-8 h-8">
@@ -134,7 +171,7 @@ const SharedPasswordsList: React.FC = () => {
                             </div>
 
                             {/* Second Column - Shared By Email */}
-                            <div className="flex flex-col items-center justify-center w-2/4">
+                            <div className="flex flex-col items-center justify-center w-2/5">
                                 <p className="text-sm text-gray-500 mb-2">Shared by:</p>
                                 <span className="px-3 py-1 text-sm font-medium  text-gray-800">
                                     {shared.shared_by_email}
@@ -142,59 +179,81 @@ const SharedPasswordsList: React.FC = () => {
                             </div>
 
                             {/* Third Column - Access Level */}
-                            <div className="flex flex-col items-center justify-center w-1/4">
+                            <div className="flex flex-col items-center justify-center w-1/5">
                                 <p className="text-sm text-gray-500 mb-2">Access level:</p>
-                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                    shared.permission_level === 'admin' 
-                                        ? 'bg-yellow-100 text-yellow-800' 
+                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${shared.permission_level === 'admin'
+                                        ? 'bg-yellow-100 text-yellow-800'
                                         : shared.permission_level === 'write'
-                                        ? 'bg-blue-100 text-blue-800'
-                                        : 'bg-gray-100 text-gray-800'
-                                }`}>
+                                            ? 'bg-blue-100 text-blue-800'
+                                            : 'bg-gray-100 text-gray-800'
+                                    }`}>
                                     {shared?.permission_level?.charAt(0).toUpperCase() + shared?.permission_level?.slice(1)}
                                 </span>
-                                {shared.expires_at && (
-                                    <span className="text-xs text-gray-500 mt-1">
-                                        Expires: {new Date(shared.expires_at).toLocaleDateString()}
-                                    </span>
-                                )}
+                                
                             </div>
 
-                            {/* Fourth Column - Actions */}
-                            <div className="flex items-center space-x-4 w-1/4 justify-end">
-                                {shared.permission_level === 'write' && (
-                                    <button
-                                    onClick={() => handleEdit(shared.entry_id, shared)}
-                                    className="text-gray-400 hover:text-blue-500 transform hover:scale-110 transition duration-300 ease-in-out"
-                                    title="Edit item"
-                                >
-                                    <PencilIcon className="h-5 w-5" />
-                                </button>
-                                )}
-                                {shared.permission_level === 'read' && (
-                                    <button
-                                    onClick={() => handleEdit(shared.entry_id, shared)}
-                                    className="text-gray-400 hover:text-blue-500 transform hover:scale-110 transition duration-300 ease-in-out"
-                                    title="Edit item"
-                                >
-                                    <EyeIcon className="h-5 w-5" />
-                                </button>
-                                )}
-                                <button
-                                    onClick={() => handleCopyPassword(shared.encrypted_password, shared.shared_key)}
-                                    className="text-gray-400 hover:text-grey-500 transform hover:scale-110 transition duration-300 ease-in-out"
-                                    title="Copy password"
-                                >
-                                    <ClipboardIcon className="h-5 w-5" />
-                                </button>
-                                <button
-                                    onClick={() => handleRevokeAccess(shared.id)}
-                                    className="text-gray-400 hover:text-red-600"
-                                    title="Revoke access"
-                                >
-                                    <TrashIcon className="h-5 w-5" />
-                                </button>
+                            {/* Fourth Column - Expiry */}
+                            <div className="flex items-center w-1/5">
+                                <div className="text-center">
+                                    <p className="text-sm text-gray-500 mb-1">Status</p>
+                                    {shared.expires_at ? (
+                                        <>
+                                            <span className={`text-sm font-medium ${
+                                                getExpiryStatus(shared.expires_at)?.className
+                                            }`}>
+                                                {getExpiryStatus(shared.expires_at)?.status}
+                                            </span>
+                                            {getExpiryStatus(shared.expires_at)?.status === 'Active' && (
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                    Expires in: {getExpiryStatus(shared.expires_at)?.timeLeft}
+                                                </p>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <span className="text-sm font-medium text-gray-600">
+                                            Never expires
+                                        </span>
+                                    )}
+                                </div>
                             </div>
+
+                            {/* Fifth Column - Actions */}
+                            {!isShareExpired(shared?.expires_at) && (
+                                <div className="flex items-center space-x-4 w-1/5 justify-end">
+                                    {shared.permission_level === 'write' && (
+                                        <button
+                                            onClick={() => handleEdit(shared.entry_id, shared)}
+                                            className="text-gray-400 hover:text-blue-500 transform hover:scale-110 transition duration-300 ease-in-out"
+                                            title="Edit item"
+                                        >
+                                            <PencilIcon className="h-5 w-5" />
+                                        </button>
+                                    )}
+                                    {shared.permission_level === 'read' && (
+                                        <button
+                                            onClick={() => handleEdit(shared.entry_id, shared)}
+                                            className="text-gray-400 hover:text-blue-500 transform hover:scale-110 transition duration-300 ease-in-out"
+                                            title="Edit item"
+                                        >
+                                            <EyeIcon className="h-5 w-5" />
+                                        </button>
+                                    )}
+                                    <button
+                                        onClick={() => handleCopyPassword(shared.encrypted_password, shared.shared_key)}
+                                        className="text-gray-400 hover:text-grey-500 transform hover:scale-110 transition duration-300 ease-in-out"
+                                        title="Copy password"
+                                    >
+                                        <ClipboardIcon className="h-5 w-5" />
+                                    </button>
+                                    <button
+                                        onClick={() => handleRevokeAccess(shared.id)}
+                                        className="text-gray-400 hover:text-red-600"
+                                        title="Revoke access"
+                                    >
+                                        <TrashIcon className="h-5 w-5" />
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </li>
                 ))}
@@ -216,7 +275,7 @@ const SharedPasswordsList: React.FC = () => {
                     permissionLevel={permissionLevel}
                     onSuccessfulUpdate={loadSharedPasswords}
                 />
-            )}  
+            )}
         </div>
     );
 };

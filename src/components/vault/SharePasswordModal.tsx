@@ -85,6 +85,7 @@ const SharePasswordModal: React.FC<SharePasswordModalProps> = ({
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     >
                         <option value="never">Never</option>
+                        <option value="24hr">24 hours</option>
                         <option value="7">7 days</option>
                         <option value="30">30 days</option>
                         <option value="90">90 days</option>
