@@ -127,7 +127,7 @@ export class VaultService {
     }
 
     public static encryptEntry(entry: Partial<ICreatePasswordEntry>): any {
-        const vaultKey = this.getMasterKey();
+        const encryptionKey = entry.sharedKey || this.getMasterKey();
         
         try {
             if (!entry.title || !entry.username || !entry.password) {
@@ -137,14 +137,14 @@ export class VaultService {
             let encryptedUsername, encryptedPassword, encryptedNotes;
             
             try {
-                encryptedUsername = encryptData(entry.username, vaultKey);
+                encryptedUsername = encryptData(entry.username, encryptionKey);
             } catch (error) {
                 console.error('Username encryption failed:', error);
                 throw new Error('Failed to encrypt username');
             }
 
             try {
-                encryptedPassword = encryptData(entry.password, vaultKey);
+                encryptedPassword = encryptData(entry.password, encryptionKey);
             } catch (error) {
                 console.error('Password encryption failed:', error);
                 throw new Error('Failed to encrypt password');
@@ -152,7 +152,7 @@ export class VaultService {
 
             if (entry.notes) {
                 try {
-                    encryptedNotes = encryptData(entry.notes, vaultKey);
+                    encryptedNotes = encryptData(entry.notes, encryptionKey);
                 } catch (error) {
                     console.error('Notes encryption failed:', error);
                     encryptedNotes = null;
@@ -166,7 +166,8 @@ export class VaultService {
                 encrypted_notes: encryptedNotes,
                 website_url: entry.website_url || '',
                 category: entry.category || '',
-                favorite: entry.favorite || false
+                favorite: entry.favorite || false,
+                isSharedUpdate: !!entry.sharedKey
             };
         } catch (error) {
             console.error('Encryption error:', error);
@@ -174,84 +175,49 @@ export class VaultService {
         }
     }
 
-    public static decryptEntry(entry: IPasswordEntry): IDecryptedPasswordEntry {
-        const vaultKey = this.getMasterKey();
+    public static decryptEntry(entry: IPasswordEntry, sharedKey?: string): IDecryptedPasswordEntry {
+        const decryptionKey = sharedKey || this.getMasterKey();
         
         try {
-            // Helper function to safely decrypt buffer data
             const decryptBufferData = (encryptedBuffer: any): string => {
                 if (!encryptedBuffer) return '';
                 
                 try {
-                    // Handle buffer data from server
                     if (encryptedBuffer.data && Array.isArray(encryptedBuffer.data)) {
-                        // Convert array back to encrypted string
                         const uint8Array = new Uint8Array(encryptedBuffer.data);
                         const encryptedString = new TextDecoder().decode(uint8Array);
-                        
-                        // Decrypt the data
-                        return decryptData(encryptedString, vaultKey);
+                        return decryptData(encryptedString, decryptionKey);
                     }
                     
-                    // If it's already a string
                     if (typeof encryptedBuffer === 'string') {
-                        return decryptData(encryptedBuffer, vaultKey);
+                        return decryptData(encryptedBuffer, decryptionKey);
                     }
 
                     return '';
                 } catch (error) {
-                    console.error('Error decrypting buffer:', error, {
-                        bufferType: typeof encryptedBuffer,
-                        hasData: !!encryptedBuffer?.data
-                    });
-                    return ''; // Return empty string instead of throwing
+                    console.error('Error decrypting buffer:', error);
+                    return '';
                 }
             };
 
-            // Decode encrypted data with error handling for each field
-            try {
-                const decryptedData = {
-                    id: entry.id,
-                    vault_id: entry.vault_id,
-                    title: entry.title,
-                    username: decryptBufferData(entry.encrypted_username),
-                    password: decryptBufferData(entry.encrypted_password),
-                    notes: entry.encrypted_notes ? 
-                        decryptBufferData(entry.encrypted_notes) : undefined,
-                    website_url: entry.website_url || '',
-                    category: entry.category || '',
-                    favorite: entry.favorite,
-                    last_used: entry.last_used ? new Date(entry.last_used) : undefined,
-                    password_strength: entry.password_strength || 0,
-                    created_at: new Date(entry.created_at),
-                    updated_at: new Date(entry.updated_at)
-                };
+            const decryptedData = {
+                id: entry.id,
+                vault_id: entry.vault_id,
+                title: entry.title,
+                username: decryptBufferData(entry.encrypted_username),
+                password: decryptBufferData(entry.encrypted_password),
+                notes: entry.encrypted_notes ? 
+                    decryptBufferData(entry.encrypted_notes) : undefined,
+                website_url: entry.website_url || '',
+                category: entry.category || '',
+                favorite: entry.favorite,
+                last_used: entry.last_used ? new Date(entry.last_used) : undefined,
+                password_strength: entry.password_strength || 0,
+                created_at: new Date(entry.created_at),
+                updated_at: new Date(entry.updated_at)
+            };
 
-                // Validate decrypted data
-                if (!decryptedData.username || !decryptedData.password) {
-                    throw new Error('Failed to decrypt critical fields');
-                }
-
-                return decryptedData;
-            } catch (error) {
-                console.error('Error processing entry:', error);
-                // Return a partially decrypted entry instead of throwing
-                return {
-                    id: entry.id,
-                    vault_id: entry.vault_id,
-                    title: entry.title,
-                    username: '(Decryption failed)',
-                    password: '(Decryption failed)',
-                    notes: undefined,
-                    website_url: entry.website_url || '',
-                    category: entry.category || '',
-                    favorite: entry.favorite,
-                    last_used: entry.last_used ? new Date(entry.last_used) : undefined,
-                    password_strength: entry.password_strength || 0,
-                    created_at: new Date(entry.created_at),
-                    updated_at: new Date(entry.updated_at)
-                };
-            }
+            return decryptedData;
         } catch (error) {
             console.error('Decryption error:', error);
             throw new Error('Failed to decrypt password entry');

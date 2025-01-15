@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
-import { XMarkIcon} from '@heroicons/react/24/outline';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useVault } from '../../contexts/VaultContext';
 import { IDecryptedPasswordEntry } from '../../types/vault.types';
 import PasswordStrengthMeter from '../common/PasswordStrengthMeter';
 import { toast } from 'react-hot-toast';
 import Input from '../common/Input';
+import { decryptKeyData } from '../../utils/encryption';
 
 interface EditPasswordModalProps {
     entry: IDecryptedPasswordEntry;
     isOpen: boolean;
     onClose: () => void;
+    isSharedPassword?: boolean;
+    permissionLevel?: string;
+    onSuccessfulUpdate?: () => void;
 }
 
 interface FormErrors {
@@ -20,7 +24,14 @@ interface FormErrors {
     favorite?: boolean;
 }
 
-const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, onClose }) => {
+const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
+    entry,
+    isOpen,
+    onClose,
+    isSharedPassword = false,
+    permissionLevel = 'read',
+    onSuccessfulUpdate
+}) => {
     const { updateEntry, refreshFavoriteEntries } = useVault();
     const [formData, setFormData] = useState({
         title: entry.title,
@@ -28,12 +39,15 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
         password: entry.password,
         website_url: entry.website_url || '',
         notes: entry.notes || '',
-        favorite: entry.favorite || false
+        favorite: entry.favorite || false,
+        isSharedUpdate: isSharedPassword,
+        sharedKey: isSharedPassword ? decryptKeyData(entry.vault_id) : ''
     });
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<FormErrors>({});
 
+    const isReadOnly = isSharedPassword && permissionLevel === 'read';
     const validateForm = (): boolean => {
         const newErrors: FormErrors = {};
 
@@ -71,7 +85,7 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value, type } = e.target;
         const newValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
-        
+
         setFormData(prev => ({
             ...prev,
             [name]: newValue
@@ -86,22 +100,24 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
-        if (!validateForm()) {
-            return;
-        }
+        if (!validateForm()) return;
 
         setLoading(true);
-
         try {
-            await updateEntry(entry.id, formData);
-            if (entry.favorite && !formData.favorite) {
-                await refreshFavoriteEntries();
-            }
+            await updateEntry(entry.id, {
+                ...formData,
+                isSharedUpdate: isSharedPassword,
+                sharedKey: formData.sharedKey
+            });
+            await refreshFavoriteEntries();
             toast.success('Password updated successfully');
+            if (onSuccessfulUpdate) {
+                await onSuccessfulUpdate();
+            }
             onClose();
-        } catch (err) {
-            toast.error('Failed to update password entry');
+        } catch (error) {
+            console.error('Failed to update password:', error);
+            toast.error('Failed to update password');
         } finally {
             setLoading(false);
         }
@@ -114,7 +130,9 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-lg max-w-md w-full">
                 <div className="flex justify-between items-center p-4 border-b">
-                    <h2 className="text-lg font-medium">Edit Password Entry</h2>
+                    <h2 className="text-lg font-medium">
+                        {isSharedPassword ? 'View Shared Password' : 'Edit Password Entry'}
+                    </h2>
                     <button
                         onClick={onClose}
                         className="text-gray-400 hover:text-gray-500"
@@ -123,11 +141,7 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
                     </button>
                 </div>
 
-                <form 
-                    onSubmit={handleSubmit} 
-                    className="p-4" 
-                    autoComplete="off"
-                >
+                <form onSubmit={handleSubmit} className="p-4" autoComplete="off">
                     <div className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700">
@@ -138,9 +152,9 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
                                 name="title"
                                 value={formData.title}
                                 onChange={handleChange}
-                                className={`mt-1 block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
-                                    errors.title ? 'border-red-300' : 'border-gray-300'
-                                }`}
+                                disabled={isReadOnly}
+                                className={`mt-1 block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${errors.title ? 'border-red-300' : 'border-gray-300'
+                                    } ${isReadOnly ? 'bg-gray-100' : ''}`}
                             />
                             {errors.title && (
                                 <p className="mt-1 text-sm text-red-600">{errors.title}</p>
@@ -156,9 +170,9 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
                                 name="website_url"
                                 value={formData.website_url}
                                 onChange={handleChange}
-                                className={`mt-1 block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
-                                    errors.website_url ? 'border-red-300' : 'border-gray-300'
-                                }`}
+                                disabled={isReadOnly}
+                                className={`mt-1 block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${errors.website_url ? 'border-red-300' : 'border-gray-300'
+                                    } ${isReadOnly ? 'bg-gray-100' : ''}`}
                             />
                             {errors.website_url && (
                                 <p className="mt-1 text-sm text-red-600">{errors.website_url}</p>
@@ -176,9 +190,9 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
                                 onChange={handleChange}
                                 autoComplete="off"
                                 spellCheck="false"
-                                className={`mt-1 block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
-                                    errors.username ? 'border-red-300' : 'border-gray-300'
-                                }`}
+                                disabled={isReadOnly}
+                                className={`mt-1 block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${errors.username ? 'border-red-300' : 'border-gray-300'
+                                    } ${isReadOnly ? 'bg-gray-100' : ''}`}
                             />
                             {errors.username && (
                                 <p className="mt-1 text-sm text-red-600">{errors.username}</p>
@@ -190,29 +204,29 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
                                 Password
                             </label>
                             <div className="mt-1 relative rounded-md shadow-sm">
-                                
+
                                 <Input
                                     name="password"
                                     type={showPassword ? "text" : "password"}
                                     value={formData.password}
                                     onChange={handleChange}
                                     autoComplete="new-password"
-                                    className={`block w-full pr-10 rounded-md focus:ring-blue-500 focus:border-blue-500 ${
-                                        errors.password ? 'border-red-300' : 'border-gray-300'
-                                    }`}                                    
+
+                                    className={`block w-full pr-10 rounded-md focus:ring-blue-500 focus:border-blue-500 ${errors.password ? 'border-red-300' : 'border-gray-300'
+                                        } ${isReadOnly ? 'bg-gray-100' : ''}`}
                                     required
                                     showPasswordToggle
                                 />
-                                
+
                             </div>
                             {errors.password && (
                                 <p className="mt-1 text-sm text-red-600">{errors.password}</p>
                             )}
-                            <PasswordStrengthMeter 
-                                password={formData.password} 
+                            <PasswordStrengthMeter
+                                password={formData.password}
                                 email={formData.username}
                             />
-                            
+
                         </div>
 
                         <div>
@@ -224,37 +238,42 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ entry, isOpen, on
                                 value={formData.notes}
                                 onChange={handleChange}
                                 rows={3}
+                                disabled={isReadOnly}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
                             />
                         </div>
                     </div>
-                    <div className="flex items-center mt-2">
-                    <input
-                        type="checkbox"
-                            name="favorite"
-                            checked={formData.favorite}
-                            onChange={handleChange}
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                        <label className="ml-2 block text-sm text-gray-900">
-                            Add to favorites
-                        </label>
+                    {!isReadOnly && (
+                        <div className="flex items-center mt-2">
+                            <input
+                                type="checkbox"
+                                name="favorite"
+                                checked={formData.favorite}
+                                onChange={handleChange}
+                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                            />
+                            <label className="ml-2 block text-sm text-gray-900">
+                                Add to favorites
+                            </label>
                         </div>
+                    )}
                     <div className="mt-6 flex justify-end space-x-3">
                         <button
                             type="button"
                             onClick={onClose}
                             className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
                         >
-                            Cancel
+                            {isReadOnly ? 'Close' : 'Cancel'}
                         </button>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                        >
-                            {loading ? 'Saving...' : 'Save Changes'}
-                        </button>
+                        {!isReadOnly && (
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                            >
+                                {loading ? 'Saving...' : 'Save Changes'}
+                            </button>
+                        )}
                     </div>
                 </form>
             </div>

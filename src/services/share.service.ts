@@ -78,4 +78,5 @@ export class ShareService {
             throw new Error('Failed to revoke access');
         }
     }
+
 }

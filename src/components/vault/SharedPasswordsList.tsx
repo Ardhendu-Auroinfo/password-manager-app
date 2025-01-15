@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { ShareService } from '../../services/share.service';
 import { ISharedPassword } from '../../types/share.types';
-import { ClipboardIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { ClipboardIcon, EyeIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
 import { decryptData, decryptKeyData } from '../../utils/encryption';
+import { VaultService } from '../../services/vault.service';
+import EditPasswordModal from './EditPasswordModal';
+import { IDecryptedPasswordEntry } from '../../types/vault.types';
 
 const SharedPasswordsList: React.FC = () => {
     const [sharedPasswords, setSharedPasswords] = useState<ISharedPassword[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedEntry, setSelectedEntry] = useState<IDecryptedPasswordEntry | null>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [permissionLevel, setPermissionLevel] = useState<string>('');
+    const [sharedKey, setSharedKey] = useState<string>('');
 
     useEffect(() => {
         loadSharedPasswords();
@@ -49,6 +56,41 @@ const SharedPasswordsList: React.FC = () => {
             toast.error('Failed to revoke access');
         }
     };
+    const handleEdit = async (entryId: string, shared: ISharedPassword) => {
+        try {
+            setPermissionLevel(shared.permission_level);
+            const entry: IDecryptedPasswordEntry = {
+                id: shared.entry_id,
+                title: shared.title,
+                username: shared.encrypted_username ? decryptData(
+                    new TextDecoder().decode(new Uint8Array(shared.encrypted_username.data)),
+                    decryptKeyData(shared.shared_key)
+                ) : '',
+                password: shared.encrypted_password ? decryptData(
+                    new TextDecoder().decode(new Uint8Array(shared.encrypted_password.data)),
+                    decryptKeyData(shared.shared_key)
+                ) : '',
+                website_url: shared.website_url || '',
+                notes: shared.encrypted_notes ? decryptData(
+                    new TextDecoder().decode(new Uint8Array(shared.encrypted_notes.data)),
+                    decryptKeyData(shared.shared_key)
+                ) : '',
+                vault_id: shared.shared_key,
+                category: shared.category || '',
+                favorite: shared.favorite,
+                password_strength: shared.password_strength || 0,
+                created_at: shared.created_at,
+                updated_at: shared.updated_at,
+               
+            };
+            setSelectedEntry(entry);
+            setIsEditModalOpen(true);
+        } catch (err) {
+            console.error('Failed to prepare entry for editing:', err);
+            toast.error('Failed to prepare entry for editing');
+        }
+    };
+    
 
     const getFaviconUrl = (websiteUrl: string) => {
         const url = new URL(websiteUrl);
@@ -120,14 +162,23 @@ const SharedPasswordsList: React.FC = () => {
 
                             {/* Fourth Column - Actions */}
                             <div className="flex items-center space-x-4 w-1/4 justify-end">
-                                {shared.permission_level === 'admin' && (
-                                    <svg
-                                        className="w-6 h-6 text-yellow-400"
-                                        fill="currentColor"
-                                        viewBox="0 0 20 20"
-                                    >
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                    </svg>
+                                {shared.permission_level === 'write' && (
+                                    <button
+                                    onClick={() => handleEdit(shared.entry_id, shared)}
+                                    className="text-gray-400 hover:text-blue-500 transform hover:scale-110 transition duration-300 ease-in-out"
+                                    title="Edit item"
+                                >
+                                    <PencilIcon className="h-5 w-5" />
+                                </button>
+                                )}
+                                {shared.permission_level === 'read' && (
+                                    <button
+                                    onClick={() => handleEdit(shared.entry_id, shared)}
+                                    className="text-gray-400 hover:text-blue-500 transform hover:scale-110 transition duration-300 ease-in-out"
+                                    title="Edit item"
+                                >
+                                    <EyeIcon className="h-5 w-5" />
+                                </button>
                                 )}
                                 <button
                                     onClick={() => handleCopyPassword(shared.encrypted_password, shared.shared_key)}
@@ -153,6 +204,19 @@ const SharedPasswordsList: React.FC = () => {
                     </li>
                 )}
             </ul>
+            {selectedEntry && (
+                <EditPasswordModal
+                    entry={selectedEntry}
+                    isOpen={isEditModalOpen}
+                    onClose={() => {
+                        setIsEditModalOpen(false);
+                        setSelectedEntry(null);
+                    }}
+                    isSharedPassword={true}
+                    permissionLevel={permissionLevel}
+                    onSuccessfulUpdate={loadSharedPasswords}
+                />
+            )}  
         </div>
     );
 };

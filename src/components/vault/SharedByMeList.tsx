@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { ShareService } from '../../services/share.service';
 import { ISharedPassword } from '../../types/share.types';
-import { ArrowTopRightOnSquareIcon, ClipboardIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { ArrowTopRightOnSquareIcon, ClipboardIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { toast } from 'react-hot-toast';
 import { decryptData } from '../../utils/encryption';
 import { secureStore } from '../../utils/secureStore';
 import { IDecryptedPasswordEntry } from '../../types/vault.types';
+import { VaultService } from '../../services/vault.service';
+import EditPasswordModal from './EditPasswordModal';
 
 const SharedByMeList: React.FC = () => {
     const [sharedPasswords, setSharedPasswords] = useState<ISharedPassword[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedEntry, setSelectedEntry] = useState<IDecryptedPasswordEntry | null>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     useEffect(() => {
         loadSharedPasswords();
@@ -57,6 +61,16 @@ const SharedByMeList: React.FC = () => {
             return `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=32`;
         } catch {
             return '/password-manager.png';
+        }
+    };
+    const handleEdit = async (entryId: string) => {
+        try {
+            const entry = await VaultService.getEntryById(entryId);
+            setSelectedEntry(entry);
+            setIsEditModalOpen(true);
+        } catch (err) {
+            console.error('Failed to fetch entry:', err);
+            toast.error('Failed to fetch entry');
         }
     };
     const handleWebsiteLaunch = async (entry: IDecryptedPasswordEntry) => {
@@ -123,13 +137,12 @@ const SharedByMeList: React.FC = () => {
 
                             <div className="flex flex-col items-center justify-center w-1/4">
                                 <p className="text-sm text-gray-500 mb-2">Access level:</p>
-                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                    shared.permission_level === 'admin' 
-                                        ? 'bg-yellow-100 text-yellow-800' 
+                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${shared.permission_level === 'admin'
+                                        ? 'bg-yellow-100 text-yellow-800'
                                         : shared.permission_level === 'write'
-                                        ? 'bg-blue-100 text-blue-800'
-                                        : 'bg-gray-100 text-gray-800'
-                                }`}>
+                                            ? 'bg-blue-100 text-blue-800'
+                                            : 'bg-gray-100 text-gray-800'
+                                    }`}>
                                     {shared.permission_level.charAt(0).toUpperCase() + shared.permission_level.slice(1)}
                                 </span>
                                 {shared.expires_at && (
@@ -140,6 +153,13 @@ const SharedByMeList: React.FC = () => {
                             </div>
 
                             <div className="flex items-center space-x-4 w-1/4 justify-end">
+                                <button
+                                    onClick={() => handleEdit(shared.entry_id)}
+                                    className="text-gray-400 hover:text-blue-500 transform hover:scale-110 transition duration-300 ease-in-out"
+                                    title="Edit item"
+                                >
+                                    <PencilIcon className="h-5 w-5" />
+                                </button>
                                 <button
                                     onClick={() => handleCopyPassword(shared.encrypted_password)}
                                     className="text-gray-400 hover:text-grey-500 transform hover:scale-110 transition duration-300 ease-in-out"
@@ -164,7 +184,18 @@ const SharedByMeList: React.FC = () => {
                     </li>
                 )}
             </ul>
+            {selectedEntry && (
+                <EditPasswordModal
+                    entry={selectedEntry}
+                    isOpen={isEditModalOpen}
+                    onClose={() => {
+                        setIsEditModalOpen(false);
+                        setSelectedEntry(null);
+                    }}
+                />
+            )}
         </div>
+        
     );
 };
 

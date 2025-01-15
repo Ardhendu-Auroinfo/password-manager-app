@@ -15,6 +15,18 @@ export interface ISharedPassword {
         data: number[];
     };
     shared_key: string;
+    encrypted_username: {
+        type: 'Buffer';
+        data: number[];
+    };
+    encrypted_notes: {
+        type: 'Buffer';
+        data: number[];
+    };
+    favorite: boolean;
+    password_strength: number;
+    created_at: Date;
+    updated_at: Date;
 }
 
 export interface ISharePasswordRequest {
