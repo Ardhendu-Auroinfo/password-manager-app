@@ -107,24 +107,7 @@ const SharedPasswordsList: React.FC = () => {
             return { status: 'Expired', className: 'text-red-600' };
         }
         
-        const diffTime = expiry.getTime() - now.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
-        
-        let timeLeft;
-        if (diffDays > 1) {
-            timeLeft = `${diffDays} days`;
-        } else if (diffHours > 1) {
-            timeLeft = `${diffHours} hours`;
-        } else {
-            timeLeft = 'Less than 1 hour';
-        }
-        
-        return { 
-            status: 'Active', 
-            timeLeft,
-            className: 'text-green-600'
-        };
+        return { status: 'Active', className: 'text-green-600' };
     };
 
     const isShareExpired = (expiryDate: Date | null | undefined): boolean => {
@@ -145,9 +128,9 @@ const SharedPasswordsList: React.FC = () => {
             <ul className="divide-y divide-gray-200">
                 {sharedPasswords.map((shared) => (
                     <li key={shared.id} className="px-4 py-4">
-                        <div className="px-4 py-4 flex items-center justify-between sm:px-6 hover:bg-gray-50">
+                        <div className="px-4 py-4 flex items-center sm:px-6 hover:bg-gray-50">
                             {/* First Column - Icon, Title, URL */}
-                            <div className="flex items-center min-w-0 w-2/5">
+                            <div className="flex items-center min-w-0 w-1/4">
                                 <div className="flex-shrink-0">
                                     {shared.website_url && (
                                         <div className="flex-shrink-0 w-8 h-8">
@@ -171,29 +154,29 @@ const SharedPasswordsList: React.FC = () => {
                             </div>
 
                             {/* Second Column - Shared By Email */}
-                            <div className="flex flex-col items-center justify-center w-2/5">
+                            <div className="flex flex-col items-center justify-center w-1/4">
                                 <p className="text-sm text-gray-500 mb-2">Shared by:</p>
-                                <span className="px-3 py-1 text-sm font-medium  text-gray-800">
+                                <span className="px-3 py-1 text-sm font-medium text-gray-800">
                                     {shared.shared_by_email}
                                 </span>
                             </div>
 
                             {/* Third Column - Access Level */}
-                            <div className="flex flex-col items-center justify-center w-1/5">
+                            <div className="flex flex-col items-center justify-center w-1/4">
                                 <p className="text-sm text-gray-500 mb-2">Access level:</p>
-                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${shared.permission_level === 'admin'
+                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                    shared.permission_level === 'admin'
                                         ? 'bg-yellow-100 text-yellow-800'
                                         : shared.permission_level === 'write'
                                             ? 'bg-blue-100 text-blue-800'
                                             : 'bg-gray-100 text-gray-800'
-                                    }`}>
+                                }`}>
                                     {shared?.permission_level?.charAt(0).toUpperCase() + shared?.permission_level?.slice(1)}
                                 </span>
-                                
                             </div>
 
                             {/* Fourth Column - Expiry */}
-                            <div className="flex items-center w-1/5">
+                            <div className="flex items-center justify-center w-1/4">
                                 <div className="text-center">
                                     <p className="text-sm text-gray-500 mb-1">Status</p>
                                     {shared.expires_at ? (
@@ -203,11 +186,12 @@ const SharedPasswordsList: React.FC = () => {
                                             }`}>
                                                 {getExpiryStatus(shared.expires_at)?.status}
                                             </span>
-                                            {getExpiryStatus(shared.expires_at)?.status === 'Active' && (
-                                                <p className="text-xs text-gray-500 mt-1">
-                                                    Expires in: {getExpiryStatus(shared.expires_at)?.timeLeft}
-                                                </p>
-                                            )}
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                {getExpiryStatus(shared.expires_at)?.status === 'Expired' 
+                                                    ? `Expired at: ${new Date(shared.expires_at).toLocaleDateString()}`
+                                                    : `Expires: ${new Date(shared.expires_at).toLocaleDateString()}`
+                                                }
+                                            </p>
                                         </>
                                     ) : (
                                         <span className="text-sm font-medium text-gray-600">
@@ -217,9 +201,9 @@ const SharedPasswordsList: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Fifth Column - Actions */}
+                            {/* Fifth Column - Actions (Only shown if not expired) */}
                             {!isShareExpired(shared?.expires_at) && (
-                                <div className="flex items-center space-x-4 w-1/5 justify-end">
+                                <div className="flex items-center space-x-4 ml-4">
                                     {shared.permission_level === 'write' && (
                                         <button
                                             onClick={() => handleEdit(shared.entry_id, shared)}
@@ -233,7 +217,7 @@ const SharedPasswordsList: React.FC = () => {
                                         <button
                                             onClick={() => handleEdit(shared.entry_id, shared)}
                                             className="text-gray-400 hover:text-blue-500 transform hover:scale-110 transition duration-300 ease-in-out"
-                                            title="Edit item"
+                                            title="View item"
                                         >
                                             <EyeIcon className="h-5 w-5" />
                                         </button>
