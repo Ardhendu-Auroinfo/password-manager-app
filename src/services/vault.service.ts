@@ -5,6 +5,7 @@ import { config } from '../extension/config';
 import { secureStore } from '../utils/secureStore';
 
 const API_URL = config.API_URL;
+const EXTENSION_ID = config.EXTENSION_ID;
 
 export class VaultService {
     private baseUrl: string;
@@ -52,7 +53,27 @@ export class VaultService {
 
     static async getAllEntries(): Promise<IDecryptedPasswordEntry[]> {
         const entries = await this.request<IPasswordEntry[]>('/entries');
-        return this.decryptEntries(entries);
+        const decryptedEntries = this.decryptEntries(entries);
+        
+        // Save to extension storage
+        if (chrome.runtime && EXTENSION_ID) {
+            chrome.runtime.sendMessage(
+                EXTENSION_ID,
+                { 
+                    type: 'SAVE_ENTRIES',
+                    payload: decryptedEntries 
+                },
+                (response) => {
+                    if (chrome.runtime.lastError) {
+                        console.error('Failed to save entries to extension:', chrome.runtime.lastError);
+                    } else {
+                        console.log('Entries saved to extension storage');
+                    }
+                }
+            );
+        }
+        
+        return decryptedEntries;
     }
 
     static async getFavoriteEntries(): Promise<IDecryptedPasswordEntry[]> {
@@ -63,35 +84,16 @@ export class VaultService {
     static async createEntry(entry: ICreatePasswordEntry): Promise<IDecryptedPasswordEntry> {
         try {
             const encryptedEntry = this.encryptEntry(entry);
-            
-            if (!encryptedEntry.encrypted_username || !encryptedEntry.encrypted_password) {
-                throw new Error('Failed to encrypt entry data');
-            }
-
             const response = await this.request<IPasswordEntry>('/entries', 'POST', encryptedEntry);
+            const decryptedEntry = this.decryptEntry(response);
             
-            if (!response) {
-                throw new Error('No response from server');
-            }
-
-            return {
-                id: response.id,
-                vault_id: response.vault_id,
-                title: entry.title,
-                username: entry.username,
-                password: entry.password,
-                notes: entry.notes,
-                website_url: entry.website_url || '',
-                category: entry.category || '',
-                favorite: entry.favorite || false,
-                created_at: new Date(response.created_at),
-                updated_at: new Date(response.updated_at),
-                last_used: response.last_used ? new Date(response.last_used) : undefined,
-                password_strength: response.password_strength || 0
-            };
+            // Refresh entries in extension storage
+            const allEntries = await this.getAllEntries();
+            
+            return decryptedEntry;
         } catch (error) {
             console.error('Create entry error:', error);
-            throw new Error(error instanceof Error ? error.message : 'Failed to create entry');
+            throw error;
         }
     }
 

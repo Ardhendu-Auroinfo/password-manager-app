@@ -1,10 +1,19 @@
-
-
 export {};
 
 chrome.runtime.onInstalled.addListener(() => {
     console.log('Extension installed');
 });
+
+// At the top of the file, add a function to handle entries
+const saveEntriesToStorage = (entries: any[]) => {
+    chrome.storage.local.set({ entries }, () => {
+        if (chrome.runtime.lastError) {
+            console.error('Error saving entries:', chrome.runtime.lastError);
+        } else {
+            console.log('Entries saved successfully:', entries.length);
+        }
+    });
+};
 
 // Listen for messages from web app and content scripts
 chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
@@ -44,6 +53,11 @@ chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => 
         });
     }
 
+    if (message.type === 'SAVE_ENTRIES') {
+        saveEntriesToStorage(message.payload);
+        sendResponse({ success: true });
+    }
+
     return true;
 });
 
@@ -55,41 +69,64 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         chrome.storage.local.set({ auth: message.payload });
     }
 
+    if (message.type === 'SAVE_ENTRIES') {
+        saveEntriesToStorage(message.payload);
+        sendResponse({ success: true });
+    }
+
     if (message.type === 'GET_CREDENTIALS') {
-        chrome.storage.local.get('auth', async (result) => {
+        // First try to get entries from storage
+        chrome.storage.local.get(['auth', 'entries'], async (result) => {
             try {
                 if (!result.auth) {
                     sendResponse({ credentials: [] });
                     return;
                 }
 
-                const url = new URL(message.url);
-                const domain = url.hostname;
-
-                // Get entries from storage
-                const { entries = [] } = await chrome.storage.local.get('entries');
-                console.log('Entries:', entries);
-                
-                // Filter entries matching the domain
-                const matchingCredentials = entries.filter((entry: any) => {
-                    if (!entry.website_url) return false;
-                    try {
-                        const entryDomain = new URL(entry.website_url).hostname;
-                        return entryDomain === domain;
-                    } catch {
-                        return false;
-                    }
-                });
-
-                sendResponse({ credentials: matchingCredentials });
+                // If no entries in storage, try to fetch them
+                if (!result.entries) {
+                    // You'll need to implement this function in your VaultService
+                    chrome.runtime.sendMessage(
+                        { type: 'FETCH_ENTRIES' },
+                        (fetchResponse) => {
+                            if (fetchResponse?.entries) {
+                                saveEntriesToStorage(fetchResponse.entries);
+                                matchAndSendCredentials(fetchResponse.entries, message.url, sendResponse);
+                            } else {
+                                sendResponse({ credentials: [] });
+                            }
+                        }
+                    );
+                } else {
+                    matchAndSendCredentials(result.entries, message.url, sendResponse);
+                }
             } catch (error) {
-                console.error('Error fetching credentials:', error);
+                console.error('Error in GET_CREDENTIALS:', error);
                 sendResponse({ credentials: [] });
             }
         });
+        return true;
     }
     
     return true;
 });
+
+// Helper function to match credentials
+const matchAndSendCredentials = (entries: any[], url: string, sendResponse: Function) => {
+    const domain = new URL(url).hostname;
+    const matchingCredentials = entries.filter(entry => {
+        if (!entry.website_url) return false;
+        try {
+            const cleanUrl = entry.website_url.startsWith('@') 
+                ? entry.website_url.substring(1) 
+                : entry.website_url;
+            const entryDomain = new URL(cleanUrl).hostname;
+            return entryDomain === domain;
+        } catch (error) {
+            return false;
+        }
+    });
+    sendResponse({ credentials: matchingCredentials });
+};
 
 // Handle authentication and other background tasks

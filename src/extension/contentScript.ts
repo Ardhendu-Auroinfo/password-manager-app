@@ -13,7 +13,7 @@ const injectStyles = () => {
         }
         .lockdown-autofill-btn {
             position: absolute;
-            right: 10px;
+            right: 30px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
@@ -39,14 +39,22 @@ const injectStyles = () => {
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             z-index: 999999;
             max-width: 300px;
+            /* Add these for dark backgrounds */
+            background-color: white;
+            color: #333;
         }
         .lockdown-credentials-item {
             padding: 8px 12px;
             cursor: pointer;
             border-bottom: 1px solid #eee;
+            background-color: white;
+            color: #333;
         }
         .lockdown-credentials-item:hover {
             background-color: #f5f5f5;
+        }
+        .lockdown-credentials-item:last-child {
+            border-bottom: none;
         }
     `;
     document.head.appendChild(style);
@@ -89,6 +97,15 @@ const addAutofillButton = (input: Element) => {
     // Only add if not already present
     if (input.parentElement?.querySelector('.lockdown-autofill-btn')) return;
 
+    // Check for existing buttons or icons
+    const inputRect = input.getBoundingClientRect();
+    const existingElements = Array.from(input.parentElement?.children || [])
+        .filter(el => {
+            if (el === input) return false;
+            const rect = el.getBoundingClientRect();
+            return rect.right > inputRect.right - 40; // Check if element is in the right area
+        });
+
     // Create wrapper if it doesn't exist
     let wrapper = input.parentElement;
     if (!wrapper || !wrapper.classList.contains('lockdown-input-wrapper')) {
@@ -101,6 +118,12 @@ const addAutofillButton = (input: Element) => {
     const autofillButton = document.createElement('button');
     autofillButton.type = 'button';
     autofillButton.className = 'lockdown-autofill-btn';
+    
+    // Adjust position if there are existing elements
+    if (existingElements.length > 0) {
+        autofillButton.style.right = '60px'; // Move further left
+    }
+
     autofillButton.innerHTML = `
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
@@ -117,13 +140,21 @@ const addAutofillButton = (input: Element) => {
 
 const requestCredentials = async (targetInput: HTMLElement) => {
     const currentUrl = window.location.href;
+    console.log('Requesting credentials for URL:', currentUrl);
+    
     chrome.runtime.sendMessage({
         type: 'GET_CREDENTIALS',
         url: currentUrl
     }, (response) => {
-        console.log('Received credentials:', response); // Debug log
+        console.log('Response from background:', response);
+        if (chrome.runtime.lastError) {
+            console.error('Runtime error:', chrome.runtime.lastError);
+        }
         if (response?.credentials?.length) {
+            console.log('Found matching credentials:', response.credentials);
             showCredentialsDropdown(response.credentials, targetInput);
+        } else {
+            console.log('No matching credentials found');
         }
     });
 };
