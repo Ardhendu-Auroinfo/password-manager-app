@@ -23,10 +23,18 @@ const injectStyles = () => {
             z-index: 999998;
             display: flex;
             align-items: center;
-            opacity: 0.6;
+            opacity: 0.7;
+            transition: opacity 0.2s;
         }
         .lockdown-autofill-btn:hover {
             opacity: 1;
+        }
+        .lockdown-autofill-btn img {
+            filter: grayscale(100%);
+            transition: filter 0.2s;
+        }
+        .lockdown-autofill-btn:hover img {
+            filter: none;
         }
         .lockdown-credentials-dropdown {
             position: absolute;
@@ -91,8 +99,25 @@ const showCredentialsDropdown = (credentials: any[], targetInput: HTMLElement) =
     }, { once: true });
 };
 
+const EXCLUDED_DOMAINS = [
+    'lockdownpass.com',
+    'localhost:3000'
+];
+
+const shouldShowAutofill = (url: string): boolean => {
+    try {
+        const domain = new URL(url).hostname;
+        return !EXCLUDED_DOMAINS.some(excludedDomain => domain.includes(excludedDomain));
+    } catch {
+        return true;
+    }
+};
+
 const addAutofillButton = (input: Element) => {
     if (!(input instanceof HTMLInputElement)) return;
+    
+    // Check if we should show autofill on this domain
+    if (!shouldShowAutofill(window.location.href)) return;
     
     // Only add if not already present
     if (input.parentElement?.querySelector('.lockdown-autofill-btn')) return;
@@ -103,7 +128,7 @@ const addAutofillButton = (input: Element) => {
         .filter(el => {
             if (el === input) return false;
             const rect = el.getBoundingClientRect();
-            return rect.right > inputRect.right - 40; // Check if element is in the right area
+            return rect.right > inputRect.right - 40;
         });
 
     // Create wrapper if it doesn't exist
@@ -121,14 +146,16 @@ const addAutofillButton = (input: Element) => {
     
     // Adjust position if there are existing elements
     if (existingElements.length > 0) {
-        autofillButton.style.right = '60px'; // Move further left
+        autofillButton.style.right = '60px';
     }
 
-    autofillButton.innerHTML = `
-        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-        </svg>
-    `;
+    // Use project logo instead of SVG
+    const img = document.createElement('img');
+    img.src = chrome.runtime.getURL('icons/icon48.png');
+    img.style.width = '24px';
+    img.style.height = '24px';
+    autofillButton.appendChild(img);
+
     autofillButton.onclick = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -187,6 +214,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 const autoFillOnLoad = async () => {
     const currentUrl = window.location.href;
+    
+    // Don't autofill on excluded domains
+    if (!shouldShowAutofill(currentUrl)) return;
     
     chrome.runtime.sendMessage({
         type: 'GET_CREDENTIALS',
