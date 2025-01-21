@@ -185,12 +185,37 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
 });
 
+const autoFillOnLoad = async () => {
+    const currentUrl = window.location.href;
+    
+    chrome.runtime.sendMessage({
+        type: 'GET_CREDENTIALS',
+        url: currentUrl
+    }, (response) => {
+        if (response?.credentials?.length === 1) {
+            // If there's exactly one credential, auto-fill it
+            fillCredentials(response.credentials[0]);
+        } else if (response?.credentials?.length > 1) {
+            // If there are multiple credentials, show the dropdown on the first password field
+            const passwordField = document.querySelector('input[type="password"]');
+            if (passwordField) {
+                showCredentialsDropdown(response.credentials, passwordField as HTMLElement);
+            }
+        }
+    });
+};
+
 // Initialize
 const init = () => {
     injectStyles();
-    document.querySelectorAll('input[type="password"]').forEach((element) => {
-        addAutofillButton(element);
-    });
+    
+    // Wait for the form fields to be ready
+    setTimeout(() => {
+        document.querySelectorAll('input[type="password"]').forEach((element) => {
+            addAutofillButton(element);
+        });
+        autoFillOnLoad();
+    }, 500); // Small delay to ensure form fields are rendered
 };
 
 // Run on page load
