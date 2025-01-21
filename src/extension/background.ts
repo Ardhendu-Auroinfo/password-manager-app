@@ -2,6 +2,10 @@ export {};
 
 chrome.runtime.onInstalled.addListener(() => {
     console.log('Extension installed');
+    // Initialize storage
+    chrome.storage.local.get(['auth', 'entries'], (result) => {
+        console.log('Initial storage state:', result);
+    });
 });
 
 // At the top of the file, add a function to handle entries
@@ -20,19 +24,25 @@ chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => 
     console.log('Received external message:', message, 'from:', sender);
 
     if (message.type === 'SAVE_AUTH_DATA') {
-        chrome.storage.local.set({ auth: message.payload }, () => {
-            if (chrome.runtime.lastError) {
-                console.error('Error saving auth data:', chrome.runtime.lastError);
-                sendResponse({ success: false, error: chrome.runtime.lastError });
-            } else {
-                console.log('Auth data saved successfully');
-                chrome.runtime.sendMessage({
-                    type: 'AUTH_STATE_CHANGED',
-                    payload: message.payload
-                });
-                sendResponse({ success: true });
-            }
-        });
+        try {
+            chrome.storage.local.set({ auth: message.payload }, () => {
+                if (chrome.runtime.lastError) {
+                    console.error('Error saving auth data:', chrome.runtime.lastError);
+                    sendResponse({ success: false, error: chrome.runtime.lastError });
+                } else {
+                    console.log('Auth data saved successfully');
+                    // Broadcast to all extension components
+                    chrome.runtime.sendMessage({
+                        type: 'AUTH_STATE_CHANGED',
+                        payload: message.payload
+                    });
+                    sendResponse({ success: true });
+                }
+            });
+        } catch (error) {
+            console.error('Error in SAVE_AUTH_DATA:', error);
+            sendResponse({ success: false, error });
+        }
     }
 
     if (message.type === 'CLEAR_AUTH_DATA') {
@@ -58,7 +68,7 @@ chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => 
         sendResponse({ success: true });
     }
 
-    return true;
+    return true; // Keep the message channel open for async response
 });
 
 // Listen for internal messages
