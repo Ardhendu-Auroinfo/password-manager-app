@@ -26,49 +26,54 @@ export const useAuth = () => {
                 symmetricKey: secureStore.getSymmetricKey()
             };
 
-            const browser = getBrowserAPI();
-            if (browser) {
-                await browser.storage.local.set({ auth: safeAuthData });
+            // Try direct storage first
+            if (chrome.storage && chrome.storage.local) {
+                await chrome.storage.local.set({ auth: safeAuthData });
                 console.log('Auth data saved directly to extension storage');
-                return;
+                return { success: true };
             }
 
-            // If not in extension context, try to communicate with the extension
-            if (window.chrome && chrome.runtime && EXTENSION_ID) {
+            // Fallback to external messaging
+            if (chrome.runtime && EXTENSION_ID) {
                 return new Promise((resolve, reject) => {
                     const timeout = setTimeout(() => {
                         reject(new Error('Communication timeout'));
-                    }, 5000); // 5 second timeout
+                    }, 5000);
 
-                    chrome.runtime?.sendMessage(
-                        EXTENSION_ID,
-                        { 
-                            type: 'SAVE_AUTH_DATA',
-                            payload: safeAuthData 
-                        },
-                        (response) => {
-                            clearTimeout(timeout);
-                            
-                            if (chrome.runtime.lastError) {
-                                console.error('Extension communication failed:', chrome.runtime.lastError);
-                                reject(chrome.runtime.lastError);
-                                return;
+                    try {
+                        chrome.runtime.sendMessage(
+                            EXTENSION_ID,
+                            { 
+                                type: 'SAVE_AUTH_DATA',
+                                payload: safeAuthData 
+                            },
+                            (response) => {
+                                clearTimeout(timeout);
+                                
+                                if (chrome.runtime.lastError) {
+                                    console.error('Extension communication failed:', chrome.runtime.lastError);
+                                    reject(chrome.runtime.lastError);
+                                    return;
+                                }
+                                
+                                if (response && response.success) {
+                                    console.log('Auth data sent to extension successfully');
+                                    resolve(response);
+                                } else {
+                                    reject(new Error('Failed to save auth data'));
+                                }
                             }
-                            
-                            if (response && response.success) {
-                                console.log('Auth data sent to extension:', response);
-                                resolve(response);
-                            } else {
-                                reject(new Error('Failed to save auth data'));
-                            }
-                        }
-                    );
+                        );
+                    } catch (error) {
+                        clearTimeout(timeout);
+                        reject(error);
+                    }
                 });
-            } else {
-                console.log('No extension communication available');
             }
+
+            throw new Error('No extension communication method available');
         } catch (error) {
-            console.error('Failed to sync auth data to extension:', error);
+            console.error('Error saving auth data to extension:', error);
             throw error;
         }
     };

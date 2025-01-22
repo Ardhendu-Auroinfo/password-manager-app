@@ -3,10 +3,14 @@
   "name": "LockdownPass - Password Manager",
   "version": "1.0",
   "description": "Secure password manager extension",
-  "permissions": ["activeTab", "storage", "clipboardWrite"],
-  "host_permissions": ["https://lockdownpass.com/*", "http://localhost/*"],
+  "permissions": ["activeTab", "storage", "clipboardWrite", "webNavigation", "tabs"],
+  "host_permissions": ["<all_urls>"],
   "externally_connectable": {
-    "matches": ["http://localhost:3000/*", "http://127.0.0.1:3000/*", "https://lockdownpass.com/*"]
+    "matches": [
+      "http://localhost:3000/*",
+      "https://lockdownpass.com/*",
+      "https://app.lockdownpass.com/*"
+    ]
   },
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'",
@@ -22,13 +26,16 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://lockdownpass.com/*", "http://localhost:3000/*"],
+      "matches": ["<all_urls>"],
       "js": ["contentScript.js"],
       "run_at": "document_idle"
     }
   ],
   "background": {
-    "service_worker": "background.js",
-    "type": "module"
-  }
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [{
+    "resources": ["icons/*"],
+    "matches": ["<all_urls>"]
+  }]
 }

@@ -60,6 +60,8 @@ export interface ICreatePasswordEntry {
     website_url?: string;
     category?: string;
     favorite?: boolean; 
+    isSharedUpdate?: boolean;
+    sharedKey?: string;
 }
 
 export interface IPasswordHistory {
