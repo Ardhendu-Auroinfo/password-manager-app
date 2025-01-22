@@ -167,7 +167,7 @@ export class VaultService {
                 encrypted_password: encryptedPassword,
                 encrypted_notes: encryptedNotes,
                 website_url: entry.website_url || '',
-                category: entry.category || '',
+                category_id: entry.category_id || '',
                 favorite: entry.favorite || false,
                 isSharedUpdate: !!entry.sharedKey
             };
@@ -211,7 +211,7 @@ export class VaultService {
                 notes: entry.encrypted_notes ? 
                     decryptBufferData(entry.encrypted_notes) : undefined,
                 website_url: entry.website_url || '',
-                category: entry.category || '',
+                category_id: entry.category_id || '',
                 favorite: entry.favorite,
                 last_used: entry.last_used ? new Date(entry.last_used) : undefined,
                 password_strength: entry.password_strength || 0,
@@ -241,7 +241,7 @@ export class VaultService {
                     password: '(Decryption failed)',
                     notes: undefined,
                     website_url: entry.website_url || '',
-                    category: entry.category || '',
+                    category_id: entry.category_id || '',
                     favorite: entry.favorite,
                     last_used: entry.last_used ? new Date(entry.last_used) : undefined,
                     password_strength: entry.password_strength || 0,
@@ -254,6 +254,14 @@ export class VaultService {
 
     static async toggleFavorite(entryId: string): Promise<void> {
         await this.request(`/entries/${entryId}/favorite`, 'POST');
+    }
+
+    static async addCategoryToEntry(entryId: string, categoryId: string): Promise<void> {
+        await this.request(`/entry/${entryId}/category`, 'POST', { categoryId });
+    }
+
+    static async removeCategoryFromEntry(entryId: string): Promise<void> {
+        await this.request(`/entry/${entryId}/category`, 'DELETE');
     }
 }
 

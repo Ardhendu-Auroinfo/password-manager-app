@@ -27,7 +27,7 @@ export interface IPasswordEntry {
         data: number[];
     };
     website_url?: string;
-    category?: string;
+    category_id?: string;
     favorite: boolean;
     last_used?: string;
     password_strength?: number;
@@ -44,7 +44,7 @@ export interface IDecryptedPasswordEntry {
     password: string;
     notes?: string;
     website_url?: string;
-    category: string;
+    category_id: string;
     favorite: boolean;
     last_used?: Date;
     password_strength: number;
@@ -58,7 +58,7 @@ export interface ICreatePasswordEntry {
     password: string;
     notes?: string;
     website_url?: string;
-    category?: string;
+    category_id?: string;
     favorite?: boolean; 
     isSharedUpdate?: boolean;
     sharedKey?: string;

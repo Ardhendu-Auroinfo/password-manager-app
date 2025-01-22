@@ -6,6 +6,7 @@ import PasswordStrengthMeter from '../common/PasswordStrengthMeter';
 import { toast } from 'react-hot-toast';
 import Input from '../common/Input';
 import { decryptKeyData } from '../../utils/encryption';
+import { useCategories } from '../../contexts/CategoryContext';
 
 interface EditPasswordModalProps {
     entry: IDecryptedPasswordEntry;
@@ -33,6 +34,7 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
     onSuccessfulUpdate
 }) => {
     const { updateEntry, refreshFavoriteEntries } = useVault();
+    const { categories } = useCategories();
     const [formData, setFormData] = useState({
         title: entry.title,
         username: entry.username,
@@ -40,6 +42,7 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
         website_url: entry.website_url || '',
         notes: entry.notes || '',
         favorite: entry.favorite || false,
+        category_id: entry.category_id || '',
         isSharedUpdate: isSharedPassword,
         sharedKey: isSharedPassword ? decryptKeyData(entry.vault_id) : ''
     });
@@ -82,13 +85,13 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
         }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
         const newValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value;
 
         setFormData(prev => ({
             ...prev,
-            [name]: newValue
+            [name]: newValue === '' ? null : newValue
         }));
         if (errors[name as keyof FormErrors]) {
             setErrors(prev => ({
@@ -241,6 +244,25 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
                                 disabled={isReadOnly}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
                             />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">
+                                Category
+                            </label>
+                            <select
+                                name="category_id"
+                                value={formData.category_id}
+                                onChange={handleChange}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                <option value="">No Category</option>
+                                {categories.map(category => (
+                                    <option key={category.id} value={category.id}>
+                                        {category.name}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                     {!isReadOnly && (

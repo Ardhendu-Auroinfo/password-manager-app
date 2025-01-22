@@ -35,7 +35,7 @@ const Popup: React.FC = () => {
         password: '',
         website_url: '',
         notes: '',
-        category: '',
+        category_id: '',
         favorite: false
     });
 

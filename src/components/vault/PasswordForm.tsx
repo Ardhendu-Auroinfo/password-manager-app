@@ -30,7 +30,7 @@ const PasswordForm: React.FC<PasswordFormProps> = ({
         password: initialData?.password || '',
         notes: initialData?.notes || '',
         website_url: initialData?.website_url || '',
-        category: initialData?.category || '',
+        category_id: initialData?.category_id || '',
         favorite: initialData?.favorite || false
     });
 

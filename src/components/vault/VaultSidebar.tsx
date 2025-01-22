@@ -51,6 +51,23 @@ const VaultSidebar: React.FC = () => {
                             Favorites
                         </Link>
                         <Link
+                            to="/categories"
+                            className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md hover:bg-gray-50 hover:text-gray-900 ${
+                                location.pathname === '/categories'
+                                    ? 'bg-gray-100 text-gray-900'
+                                    : 'text-gray-600'
+                            }`}
+                        >
+                            {location.pathname === '/categories' ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="mr-3 h-6 w-6">
+                                    <path d="M19.5 21a3 3 0 003-3v-4.5a3 3 0 00-3-3h-15a3 3 0 00-3 3V18a3 3 0 003 3h15zM1.5 10.146V6a3 3 0 013-3h5.379a2.25 2.25 0 011.59.659l2.122 2.121c.14.141.331.22.53.22H19.5a3 3 0 013 3v1.146A4.483 4.483 0 0019.5 9h-15a4.483 4.483 0 00-3 1.146z" />
+                                </svg>
+                            ) : (
+                                <FolderIcon className="mr-3 h-6 w-6" />
+                            )}
+                            Categories
+                        </Link>
+                        <Link
                             to="/sharing-center"
                             className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md hover:bg-gray-50 hover:text-gray-900 ${
                                 location.pathname === '/sharing-center'
@@ -70,11 +87,6 @@ const VaultSidebar: React.FC = () => {
                             Sharing Center
                         </Link>
                         
-                        
-                        {/* <a href="#" className="group flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
-                            <FolderIcon className="mr-3 h-6 w-6" />
-                            Categories
-                        </a> */}
                     </nav>
                 </div>
             </div>

@@ -28,7 +28,7 @@ const ExtensionPasswordForm: React.FC<ExtensionPasswordFormProps> = ({
         password: initialData?.password || '',
         website_url: initialData?.website_url || '',
         notes: initialData?.notes || '',
-        category: initialData?.category || '',
+        category_id: initialData?.category_id || '',
         favorite: initialData?.favorite || false
     });
 

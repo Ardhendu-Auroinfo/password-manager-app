@@ -9,7 +9,7 @@ export interface ISharedPassword {
     expires_at?: Date;
     title: string;
     website_url?: string;
-    category?: string;
+    category_id?: string;
     encrypted_password: {
         type: 'Buffer';
         data: number[];

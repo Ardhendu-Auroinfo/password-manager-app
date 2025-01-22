@@ -1,24 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { KeyIcon, ClipboardIcon, PencilIcon, TrashIcon, ArrowTopRightOnSquareIcon, ShareIcon } from '@heroicons/react/24/outline';
+import { KeyIcon, ClipboardIcon, PencilIcon, TrashIcon, ArrowTopRightOnSquareIcon, ShareIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useVault } from '../../contexts/VaultContext';
 import { IDecryptedPasswordEntry } from '../../types/vault.types';
 import EditPasswordModal from './EditPasswordModal';
 import { VaultService } from '../../services/vault.service';
 import { toast } from 'react-hot-toast';
 import SharePasswordModal from './SharePasswordModal';
-
+import { useLocation } from 'react-router-dom';
 interface PasswordListProps {
-    entries: IDecryptedPasswordEntry[];
+    entries?: IDecryptedPasswordEntry[];
+    categoryId?: string;
     loading?: boolean;
     error?: string | null;
+    showCategoryBadge?: boolean;
 }
 
-const PasswordList: React.FC<PasswordListProps> = ({ entries, loading, error }) => {
-    const { deleteEntry } = useVault();
+const PasswordList: React.FC<PasswordListProps> = ({ entries, categoryId, loading, error, showCategoryBadge }) => {
+    const { deleteEntry, refreshEntries } = useVault();
     const [selectedEntry, setSelectedEntry] = useState<IDecryptedPasswordEntry | null>(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [shareEntry, setShareEntry] = useState<IDecryptedPasswordEntry | null>(null);
+    const location = useLocation();
 
     const getFaviconUrl = (websiteUrl: string): string => {
         try {
@@ -74,6 +77,18 @@ const PasswordList: React.FC<PasswordListProps> = ({ entries, loading, error }) 
         setIsShareModalOpen(true);
     };
 
+    const handleRemoveFromCategory = async (entryId: string) => {
+        try {
+            if (window.confirm('Are you sure you want to remove this password from its category?')) {
+                await VaultService.removeCategoryFromEntry(entryId);
+                await refreshEntries(); 
+                toast.success('Password removed from category');
+            }
+        } catch (error) {
+            toast.error('Failed to remove password from category');
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center p-8">
@@ -90,7 +105,7 @@ const PasswordList: React.FC<PasswordListProps> = ({ entries, loading, error }) 
         );
     }
 
-    if (entries.length === 0) {
+    if (entries?.length === 0) {
         return (
             <div className="text-center py-8">
                 <KeyIcon className="mx-auto h-12 w-12 text-gray-400" />
@@ -104,7 +119,7 @@ const PasswordList: React.FC<PasswordListProps> = ({ entries, loading, error }) 
         <>
             <div className="bg-white shadow overflow-hidden sm:rounded-md">
                 <ul className="divide-y divide-gray-200">
-                    {entries.map((entry: IDecryptedPasswordEntry) => (
+                    {entries?.map((entry: IDecryptedPasswordEntry) => (
                         <li key={entry.id}>
                             <div className="px-4 py-4 flex items-center justify-between sm:px-6 hover:bg-gray-50">
                                 <div className="flex items-center min-w-0 flex-1">
@@ -192,6 +207,16 @@ const PasswordList: React.FC<PasswordListProps> = ({ entries, loading, error }) 
                                     >
                                         <ShareIcon className="h-5 w-5" />
                                     </button>
+
+                                    {entry.category_id && location.pathname === '/categories' && (
+                                        <button
+                                            onClick={() => handleRemoveFromCategory(entry.id)}
+                                            className="text-gray-400 hover:text-red-500 transform hover:scale-110 transition duration-300 ease-in-out"
+                                            title="Remove from category"
+                                    >
+                                        <XMarkIcon className="h-5 w-5" />
+                                    </button>
+                                    )}
                                 </div>
 
                             </div>

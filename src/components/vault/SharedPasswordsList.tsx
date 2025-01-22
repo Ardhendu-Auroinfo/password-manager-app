@@ -76,7 +76,7 @@ const SharedPasswordsList: React.FC = () => {
                     decryptKeyData(shared.shared_key)
                 ) : '',
                 vault_id: shared.shared_key,
-                category: shared.category || '',
+                category_id: shared.category_id || '',
                 favorite: shared.favorite,
                 password_strength: shared.password_strength || 0,
                 created_at: shared.created_at,
