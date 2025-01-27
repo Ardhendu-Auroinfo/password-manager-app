@@ -16,6 +16,8 @@ import RecoveryPage from './pages/auth/RecoveryPage';
 import SharingCenterPage from './pages/vault/SharingCenterPage';
 import CategoryPage from './pages/vault/CategoriesPage';
 import { CategoryProvider } from './contexts/CategoryContext';
+import FeaturesPage from './pages/FeaturesPage';
+import LandingPage from './pages/LandingPage';
 // Separate component for routes that uses Redux hooks
 const AppRoutes: React.FC = () => {
     const { user } = useAppSelector((state) => state.auth);
@@ -25,6 +27,9 @@ const AppRoutes: React.FC = () => {
             <CategoryProvider>
                 <Routes>
                     {/* Public Routes */}
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/features" element={<FeaturesPage />} />
+
                     <Route 
                         path="/login" 
                         element={user ? <Navigate to="/vault" replace /> : <LoginPage />} 
@@ -64,7 +69,7 @@ const AppRoutes: React.FC = () => {
                     {/* Redirect root to appropriate page */}
                     <Route 
                         path="/" 
-                        element={<Navigate to={user ? "/vault" : "/login"} replace />} 
+                        element={<Navigate to={user ? "/vault" : "/"} replace />} 
                     />
 
                     {/* 404 Page */}

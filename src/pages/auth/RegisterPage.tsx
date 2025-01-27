@@ -1,11 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import RegisterForm from '../../components/auth/RegisterForm';
+import Navbar from '../../components/common/Navbar';
 
 const RegisterPage: React.FC = () => {
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white">
+            <Navbar />
+            <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+                <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
                     Create your account
                 </h2>
@@ -38,6 +41,7 @@ const RegisterPage: React.FC = () => {
                                 Sign in
                             </Link>
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>

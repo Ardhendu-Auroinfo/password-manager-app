@@ -9,6 +9,7 @@ import { logout, setCredentials } from '../../store/slices/authSlice';
 import { useAppDispatch } from '../../hooks/useRedux';
 import { secureStore } from '../../utils/secureStore';
 import { decryptKeyData, decryptVaultKey } from '../../utils/encryption';
+import Navbar from '../../components/common/Navbar';
 
 const RecoveryPage: React.FC = () => {
     const location = useLocation();
@@ -151,8 +152,10 @@ const RecoveryPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white">
+            <Navbar />
+            <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+                <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
                     Account Recovery
                 </h2>
@@ -263,6 +266,7 @@ const RecoveryPage: React.FC = () => {
                     )}
                 </div>
             </div>
+        </div>
         </div>
     );
 };
