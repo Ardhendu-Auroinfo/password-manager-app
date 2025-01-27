@@ -12,6 +12,9 @@ import ExtensionPasswordForm from './components/ExtensionPasswordForm';
 import './popup.css';
 import { config } from '../config';
 import { secureStore } from '../../utils/secureStore';
+import AutosaveDetector from './components/AutosaveDetector';
+import AutosavePrompt from './components/AutosavePrompt';
+
 interface DropdownState {
     [key: string]: boolean;
 }
@@ -40,6 +43,8 @@ const Popup: React.FC = () => {
     });
 
     const [openDropdown, setOpenDropdown] = useState<DropdownState>({});
+
+    const [autosaveCredentials, setAutosaveCredentials] = useState<any>(null);
 
     // Function to toggle dropdown
     const toggleDropdown = (entryId: string) => {
@@ -106,6 +111,16 @@ const Popup: React.FC = () => {
         });
     }, []);
 
+    useEffect(() => {
+        chrome.storage.local.get(['pendingCredentials'], (result) => {
+            if (result.pendingCredentials) {
+                setAutosaveCredentials(result.pendingCredentials);
+                // Clear pending credentials
+                chrome.storage.local.remove('pendingCredentials');
+            }
+        });
+    }, []);
+
     const filteredEntries = entries.filter(entry => 
         entry.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         entry.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -116,25 +131,6 @@ const Popup: React.FC = () => {
         (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
     );
 
-    // const handleAddEntry = async (e: React.FormEvent) => {
-    //     e.preventDefault();
-    //     try {
-    //         await VaultService.createEntry(formData);
-    //         await refreshEntries();
-    //         setShowAddForm(false);
-    //         setFormData({
-    //             title: '',
-    //             username: '',
-    //             password: '',
-    //             website_url: '',
-    //             notes: '',
-    //             category: '',
-    //             favorite: false
-    //         });
-    //     } catch (error) {
-    //         console.error('Failed to add entry:', error);
-    //     }
-    // };
     const handleAddEntry = async (data: ICreatePasswordEntry) => {
         try {
             setIsLoading(true);
@@ -164,31 +160,6 @@ const Popup: React.FC = () => {
             setIsLoading(false);
         }
     };
-
-    // const handleEditEntry = async (e: React.FormEvent) => {
-    //     e.preventDefault();
-    //     if (!selectedEntry) return;
-
-    //     try {
-    //         await VaultService.updateEntry(selectedEntry.id, formData);
-    //         await refreshEntries();
-    //         setShowEditForm(false);
-    //         setSelectedEntry(null);
-    //     } catch (error) {
-    //         console.error('Failed to update entry:', error);
-    //     }
-    // };
-
-    // const handleDeleteEntry = async (id: string) => {
-    //     if (window.confirm('Are you sure you want to delete this entry?')) {
-    //         try {
-    //             await VaultService.deleteEntry(id);
-    //             await refreshEntries();
-    //         } catch (error) {
-    //             console.error('Failed to delete entry:', error);
-    //         }
-    //     }
-    // };
 
     const handleDeleteEntry = async (id: string) => {
         if (window.confirm('Are you sure you want to delete this password?')) {
@@ -259,186 +230,126 @@ const Popup: React.FC = () => {
         );
     }
 
-    // Entry Form Component
-    // const EntryForm = ({ isEdit = false }) => (
-    //     <form onSubmit={isEdit ? handleEditEntry : handleAddEntry} className="p-4 space-y-4">
-    //         <div>
-    //             <input
-    //                 type="text"
-    //                 placeholder="Title"
-    //                 value={formData.title}
-    //                 onChange={e => setFormData({ ...formData, title: e.target.value })}
-    //                 className="w-full px-3 py-2 border rounded-md"
-    //                 required
-    //             />
-    //         </div>
-    //         <div>
-    //             <input
-    //                 type="text"
-    //                 placeholder="Username"
-    //                 value={formData.username}
-    //                 onChange={e => setFormData({ ...formData, username: e.target.value })}
-    //                 className="w-full px-3 py-2 border rounded-md"
-    //                 required
-    //             />
-    //         </div>
-    //         <div>
-    //             <input
-    //                 type="password"
-    //                 placeholder="Password"
-    //                 value={formData.password}
-    //                 onChange={e => setFormData({ ...formData, password: e.target.value })}
-    //                 className="w-full px-3 py-2 border rounded-md"
-    //                 required
-    //             />
-    //         </div>
-    //         <div>
-    //             <input
-    //                 type="url"
-    //                 placeholder="Website URL"
-    //                 value={formData.website_url}/login
-    //                 onChange={e => setFormData({ ...formData, website_url: e.target.value })}
-    //                 className="w-full px-3 py-2 border rounded-md"
-    //             />
-    //         </div>
-    //         <div>
-    //             <textarea
-    //                 placeholder="Notes"
-    //                 value={formData.notes}
-    //                 onChange={e => setFormData({ ...formData, notes: e.target.value })}
-    //                 className="w-full px-3 py-2 border rounded-md"
-    //             />
-    //         </div>
-    //         <div className="flex justify-end space-x-2">
-    //             <button
-    //                 type="button"
-    //                 onClick={() => isEdit ? setShowEditForm(false) : setShowAddForm(false)}
-    //                 className="px-4 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200"
-    //             >
-    //                 Cancel
-    //             </button>
-    //             <button
-    //                 type="submit"
-    //                 className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600"
-    //             >
-    //                 {isEdit ? 'Update' : 'Add'}
-    //             </button>
-    //         </div>
-    //     </form>
-    // );
-
-    
     return (
-        <div className="w-80 h-[600px] bg-white flex flex-col">
-            {/* Fixed Header */}
-            <div className="flex-shrink-0 p-4 bg-white border-b">
-                <div className="relative">
-                    <input
-                        type="text"
-                        placeholder="Search"
-                        value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
-                        className="w-full px-3 py-2 pl-10 pr-4 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    <svg 
-                        className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                    >
-                        <path 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round" 
-                            strokeWidth={2} 
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+        <>
+            <AutosaveDetector />
+            {autosaveCredentials && (
+                <AutosavePrompt
+                    initialData={autosaveCredentials}
+                    onClose={() => setAutosaveCredentials(null)}
+                />
+            )}
+            <div className="w-80 h-[600px] bg-white flex flex-col">
+                {/* Fixed Header */}
+                <div className="flex-shrink-0 p-4 bg-white border-b">
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="Search"
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            className="w-full px-3 py-2 pl-10 pr-4 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                         />
-                    </svg>
+                        <svg 
+                            className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" 
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                        >
+                            <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth={2} 
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+                            />
+                        </svg>
+                    </div>
+                </div>
+
+                {/* Scrollable Content Area */}
+                <div className="flex-1 overflow-y-auto min-h-0">
+                    {showAddForm && (
+                        <div className="p-4">
+                            <ExtensionPasswordForm
+                                onSubmit={handleAddEntry}
+                                onCancel={() => setShowAddForm(false)}
+                                isLoading={isLoading}
+                            />
+                        </div>
+                    )}
+                    
+                    {showEditForm && selectedEntry && (
+                        <div className="p-4">
+                            <ExtensionPasswordForm
+                                initialData={selectedEntry}
+                                onSubmit={handleEditEntry}
+                                onCancel={() => {
+                                    setShowEditForm(false);
+                                    setSelectedEntry(null);
+                                }}
+                                isLoading={isLoading}
+                            />
+                        </div>
+                    )}
+
+                    {/* Password List */}
+                    {!showAddForm && !showEditForm && (
+                        <div className="p-4">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-lg font-medium text-gray-900">
+                                    Passwords
+                                </h3>
+                                <button
+                                    onClick={() => setShowAddForm(true)}
+                                    className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                >
+                                    Add New
+                                </button>
+                            </div>
+
+                            {loading ? (
+                                <div className="flex justify-center items-center h-32">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                                </div>
+                            ) : sortedEntries.length === 0 ? (
+                                <div className="text-center py-8 text-gray-500">
+                                    {searchQuery ? 'No passwords found' : 'No passwords saved yet'}
+                                </div>
+                            ) : (
+                                <div className="space-y-2">
+                                    {sortedEntries.map(entry => (
+                                        <PasswordEntry
+                                            key={entry.id}
+                                            entry={entry}
+                                            onEdit={(entry) => {
+                                                setSelectedEntry(entry);
+                                                setShowEditForm(true);
+                                            }}
+                                            onDelete={handleDeleteEntry}
+                                            isDropdownOpen={!!openDropdown[entry.id]}
+                                            onToggleDropdown={(id) => toggleDropdown(id)}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                {/* Fixed Footer */}
+                <div className="flex-shrink-0 p-4 border-t bg-white">
+                    <button 
+                        onClick={() => chrome.tabs.create({ url: `${config.APP_URL}/vault` })}
+                        className="w-full flex items-center justify-center space-x-2 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors duration-200"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                        </svg>
+                        <span>Open Vault</span>
+                    </button>
                 </div>
             </div>
-
-            {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-y-auto min-h-0">
-                {showAddForm && (
-                    <div className="p-4">
-                        <ExtensionPasswordForm
-                            onSubmit={handleAddEntry}
-                            onCancel={() => setShowAddForm(false)}
-                            isLoading={isLoading}
-                        />
-                    </div>
-                )}
-                
-                {showEditForm && selectedEntry && (
-                    <div className="p-4">
-                        <ExtensionPasswordForm
-                            initialData={selectedEntry}
-                            onSubmit={handleEditEntry}
-                            onCancel={() => {
-                                setShowEditForm(false);
-                                setSelectedEntry(null);
-                            }}
-                            isLoading={isLoading}
-                        />
-                    </div>
-                )}
-
-                {/* Password List */}
-                {!showAddForm && !showEditForm && (
-                    <div className="p-4">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-medium text-gray-900">
-                                Passwords
-                            </h3>
-                            <button
-                                onClick={() => setShowAddForm(true)}
-                                className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                            >
-                                Add New
-                            </button>
-                        </div>
-
-                        {loading ? (
-                            <div className="flex justify-center items-center h-32">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                            </div>
-                        ) : sortedEntries.length === 0 ? (
-                            <div className="text-center py-8 text-gray-500">
-                                {searchQuery ? 'No passwords found' : 'No passwords saved yet'}
-                            </div>
-                        ) : (
-                            <div className="space-y-2">
-                                {sortedEntries.map(entry => (
-                                    <PasswordEntry
-                                        key={entry.id}
-                                        entry={entry}
-                                        onEdit={(entry) => {
-                                            setSelectedEntry(entry);
-                                            setShowEditForm(true);
-                                        }}
-                                        onDelete={handleDeleteEntry}
-                                        isDropdownOpen={!!openDropdown[entry.id]}
-                                        onToggleDropdown={(id) => toggleDropdown(id)}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
-            </div>
-
-            {/* Fixed Footer */}
-            <div className="flex-shrink-0 p-4 border-t bg-white">
-                <button 
-                    onClick={() => chrome.tabs.create({ url: `${config.APP_URL}/vault` })}
-                    className="w-full flex items-center justify-center space-x-2 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors duration-200"
-                >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                    </svg>
-                    <span>Open Vault</span>
-                </button>
-            </div>
-        </div>
+        </>
     );
 };
 

@@ -235,9 +235,45 @@ const autoFillOnLoad = async () => {
     });
 };
 
+const detectFormSubmission = () => {
+  document.addEventListener('submit', async (event) => {
+    const form = event.target as HTMLFormElement;
+    if (!form || !(form instanceof HTMLFormElement)) return;
+
+    // Log for debugging
+    console.log('Form submission detected');
+
+    const usernameField = form.querySelector('input[type="email"], input[type="text"], input[name="email"], input[name="username"]') as HTMLInputElement;
+    const passwordField = form.querySelector('input[type="password"]') as HTMLInputElement;
+
+    if (usernameField?.value && passwordField?.value) {
+      const credentials = {
+        username: usernameField.value,
+        password: passwordField.value,
+        url: window.location.href,
+        title: document.title || new URL(window.location.href).hostname
+      };
+
+      // Log for debugging
+      console.log('Sending credentials to background:', credentials);
+
+      // Send to background script
+      chrome.runtime.sendMessage({
+        type: 'FORM_SUBMITTED',
+        credentials
+      }, (response) => {
+        // Log response for debugging
+        console.log('Background script response:', response);
+      });
+    }
+  }, true); // Use capture phase
+};
+
 // Initialize
 const init = () => {
+    console.log('Content script initialized');
     injectStyles();
+    detectFormSubmission();
     
     // Wait for the form fields to be ready
     setTimeout(() => {

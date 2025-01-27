@@ -18,6 +18,7 @@ module.exports = {
     entry: {
         popup: './src/extension/popup/index.tsx',
         contentScript: './src/extension/contentScript.ts',
+        AutosavePromptOverlay: './src/extension/AutosavePromptOverlay.ts',
         background: './src/extension/background.ts',
     },
     output: {

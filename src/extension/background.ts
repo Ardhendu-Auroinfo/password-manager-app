@@ -64,16 +64,35 @@ chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => 
     }
 
     if (message.type === 'SAVE_ENTRIES') {
-        saveEntriesToStorage(message.payload);
-        sendResponse({ success: true });
+        try {
+            chrome.storage.local.get(['entries'], (result) => {
+                const existingEntries = result.entries || [];
+                const newEntries = Array.isArray(message.payload) 
+                    ? [...existingEntries, ...message.payload]
+                    : existingEntries;
+
+                saveEntriesToStorage(newEntries);
+
+                // Verify that the entries are saved
+                chrome.storage.local.get(['entries'], (updatedResult) => {
+                    console.log('Updated entries:', updatedResult.entries);
+                });
+
+                sendResponse({ success: true });
+            });
+        } catch (error) {
+            console.error('Error saving entries:', error);
+            sendResponse({ success: false });
+        }
+        return true;
     }
 
-    return true; // Keep the message channel open for async response
+    return true; 
 });
 
 // Listen for internal messages
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log('Received internal message:', message);
+    console.log('Background received message:', message);
     
     if (message.type === 'AUTH_STATE_CHANGED') {
         chrome.storage.local.set({ auth: message.payload });
@@ -115,6 +134,52 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 sendResponse({ credentials: [] });
             }
         });
+        return true;
+    }
+    
+    if (message.type === 'FORM_SUBMITTED') {
+        console.log('Processing form submission');
+        // Delay showing the prompt to handle redirects
+        setTimeout(() => {
+            chrome.storage.local.get(['auth'], (result) => {
+                if (result.auth?.isAuthenticated) {
+                    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+                        if (tabs[0]?.id) {
+                            chrome.tabs.sendMessage(tabs[0].id, {
+                                type: 'SHOW_AUTOSAVE_PROMPT',
+                                credentials: message.credentials
+                            });
+                        }
+                    });
+                }
+            });
+        }, 1000); // 1 second delay
+        return true;
+    }
+    
+    if (message.type === 'SAVE_CREDENTIALS') {
+        try {
+            const entry = {
+                title: message.credentials.title,
+                username: message.credentials.username,
+                password: message.credentials.password,
+                website_url: message.credentials.url,
+                notes: '',
+                category_id: '',
+                favorite: false,
+            };
+            
+            // Use your VaultService to save the entry
+            chrome.runtime.sendMessage({
+                type: 'CREATE_ENTRY',
+                entry
+            }, (response) => {
+                sendResponse({ success: true });
+            });
+        } catch (error) {
+            console.error('Failed to save credentials:', error);
+            sendResponse({ success: false });
+        }
         return true;
     }
     
